@@ -1,7 +1,8 @@
 // Import Modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
-import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+import { getAuth, onAuthStateChanged,EmailAuthProvider, updatePassword, reauthenticateWithCredential } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+import { getFirestore, doc, getDoc, updateDoc, } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
 
 // Firebase configuration
 import { firebaseConfig } from '../js/firebase.js';
@@ -41,7 +42,7 @@ onAuthStateChanged(auth, async (user) => {
             emailAddressInput.value = email;
 
             // Display the user's name on the homepage
-            document.querySelector('.user-name').textContent = `Hello, ${capitalizedFirstName}!`;
+            document.querySelector('.user-name').textContent = `Hello, ${capitalizedFirstName} ${capitalizedMiddleName} ${capitalizedLastName}!`;
         } else {
             console.error("No such document in Firestore!");
         }
@@ -385,9 +386,117 @@ function createModal() {
     }
 
     // Accept changes button when clicked
-    acceptChangesButton.onclick = function() {
-        
+    acceptChangesButton.onclick = async function() {
 
+        onAuthStateChanged(auth, async (user) => {
+                const userId = user.uid;
+                const userDocRef = doc(db, "users", userId);
+                const userDoc = await getDoc(userDocRef);
+                const userData = userDoc.data(); 
+                
+                // checks if one of the input password is filled
+                if (currentPasswordInput.value !== '' || newPasswordInput.value !== '' || confirmPasswordInput.value !== '') {
+
+                    // checks if all the input fields are filled. (all password inputs must be filled)
+                    if (currentPasswordInput.value !== '' && newPasswordInput.value !== '' && confirmPasswordInput.value !== '') {
+
+                        //checks if new password is matched.
+                        if(newPasswordInput.value === confirmPasswordInput.value){
+                            
+                            // Function to change the user's password
+                            async function changePassword(currentPassword, newPassword) {
+                                const auth = getAuth();
+                                const user = auth.currentUser;
+
+                                if (user) {
+                                    const credential = EmailAuthProvider.credential(
+                                        user.email,
+                                        currentPassword
+                                    );
+
+                                    try {
+                                        // Re-authenticate the user
+                                        await reauthenticateWithCredential(user, credential);
+                                        // Update the password to database
+                                        await updatePassword(user, newPassword);
+                                        
+                                        // this checks if there is any changes on names
+                                        if (firstNameInput.value.trim() === userData.firstName.trim() && middleNameInput.value.trim() === userData.middleName.trim() && lastNameInput.value.trim() === userData.lastName.trim()) {
+                                            
+                                        } else {
+                                            if (firstNameInput.value === '' || lastNameInput.value === '') {
+                                                alert('Please fill out all password fields.');
+                                            }
+                    
+                                            else{
+                                                try {
+                                                var updates = {
+                                                    firstName : firstNameInput.value.trim(),
+                                                    middleName : middleNameInput.value.trim(),
+                                                    lastName : lastNameInput.value.trim()
+                                                };
+                                                
+                                                // update to database
+                                                await updateDoc(userDocRef, updates);
+                                    
+                                                } catch (error) {
+                                                    console.error("Error updating document: ", error);
+                                                    alert('Error updating document: ' + error.message);
+                                                }
+                                            }
+                                        }
+                                        alert("Password updated successfully!");
+                                        location.reload();
+
+                                    } catch (error) {
+                                        alert(error.message);
+                                    }
+                                } else {
+                                    console.error("No user is currently signed in.");
+                                }
+                            }
+                            const currentPasswordValue = currentPasswordInput.value;
+                            const newPasswordValue = newPasswordInput.value;
+                            changePassword(currentPasswordValue, newPasswordValue);
+                        }
+
+                        else{
+                            alert('New password doesnt match!');
+                        }
+                        
+                    } else {
+                        alert('Please fill out all password fields.');
+                    }
+
+                } else {
+                    if (firstNameInput.value.trim() === userData.firstName.trim() && middleNameInput.value.trim() === userData.middleName.trim() && lastNameInput.value.trim() === userData.lastName.trim()) {
+                        alert('No changes to the information.');
+                        location.reload();
+                    } else {
+                        if (firstNameInput.value === '' || lastNameInput.value === '') {
+                            alert('Please fill out all password fields.');
+                        }
+
+                        else{
+                            try {
+                            var updates = {
+                                firstName : firstNameInput.value.trim(),
+                                middleName : middleNameInput.value.trim(),
+                                lastName : lastNameInput.value.trim()
+                            };
+                
+                            await updateDoc(userDocRef, updates);
+                            alert('Updated successfully!');
+                            location.reload();
+                
+                            } catch (error) {
+                                console.error("Error updating document: ", error);
+                                alert('Error updating document: ' + error.message);
+                            }
+                        }
+                    }
+                }
+        });
     };
 }
 
