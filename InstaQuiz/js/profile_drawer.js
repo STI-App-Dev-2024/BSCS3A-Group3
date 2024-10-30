@@ -66,7 +66,7 @@ document.querySelector('.user-profile').addEventListener('click', function(event
 
     if (profileDrawer.style.display === 'none' || profileDrawer.style.display === '') {
         profileDrawer.style.display = 'block';
-        downArrowImage.src = 'Images/up_arrow.png';
+        downArrowImage.src = '../Images/up_arrow.png';
         userName.style.color = '#4caf50'; // Set color to green on click
         isClicked = true;
     } else {
@@ -101,7 +101,7 @@ document.addEventListener('click', function(event) {
 
     if (!userProfile.contains(event.target)) {
         profileDrawer.style.display = 'none';
-        downArrowImage.src = 'Images/down_arrow.png';
+        downArrowImage.src = '../Images/down_arrow.png';
         const userName = userProfile.querySelector('.user-name');
         userName.style.color = '';
         isClicked = false;

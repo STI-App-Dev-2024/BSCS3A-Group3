@@ -106,11 +106,18 @@ header {
 
 .user-icon {
     font-size: 24px;
-    margin-right: 10px;
+    margin-right: 4px;
 }
 
 .user-name {
-    margin-right: 10px;  
+    margin-top: 3px;
+    margin-right: 4px;
+}
+
+.arrow-icon img {
+    margin-top: 8px;
+    width: 20px;
+    height: auto;
 }
 
 .logout {
