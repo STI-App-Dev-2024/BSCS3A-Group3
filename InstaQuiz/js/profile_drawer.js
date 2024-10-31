@@ -657,7 +657,7 @@ document.querySelector('.logout').addEventListener('click', function(event) {
     // Confirm logout action
     if (confirm("Are you sure you want to logout?")) {
         alert("Logged out successfully!");
-        window.location.href = 'welcome.html'; 
+        window.location.href = '../html/welcome.html'; // if you're in the same directory
     }
 });
 
