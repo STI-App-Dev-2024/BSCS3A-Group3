@@ -155,13 +155,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // Folder creation function
+onAuthStateChanged(auth, (user) => {
+    const createFolder = document.getElementById("createBtn"); 
+    if (user) {
+        createFolder.onclick = async function() {
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const foldersRef = collection(userRef, 'folders');
+                const folderName = document.getElementById("newFolderInput").value;
+                const folderDocRef = doc(foldersRef, folderName); 
+                const date = new Date();
+
+                // Use addDoc to add a new document to the folders collection
+                await setDoc(folderDocRef, {
+                    folderCreatedDate: `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
+                    folderCreatedTime: `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}` // Format as HH:MM:SS
+                });
+                location.reload();
+            } catch (error) {
+                console.error("Error adding folder: ", error.message);
+                console.error("Error adding folder: ", error);
+                alert("Failed to create folder.");
+                location.reload();
+            }
+        }
+    }
+});
+
+
+// Folder fetch and create function 
 document.addEventListener('DOMContentLoaded', () => {
     const itemContainer = document.getElementById("folderContainer");
 
     // Function to create a single item element
     function createItem(index) {
         const folder = document.createElement("div");
-        const createFolder = document.getElementById("createBtn"); 
 
         folder.classList.add("folder"); // for css
 
@@ -178,35 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         folder.appendChild(img);
         folder.appendChild(text);
-
-        // Adding folder function
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                createFolder.onclick = async function() {
-                    try {
-                        const userRef = doc(db, 'users', user.uid);
-                        const foldersRef = collection(userRef, 'folders');
-                        const folderName = document.getElementById("newFolderInput").value;
-                        const folderDocRef = doc(foldersRef, folderName); 
-                        const date = new Date();
-
-                        // Use addDoc to add a new document to the folders collection
-                        await setDoc(folderDocRef, {
-                            folderCreatedDate: `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
-                            folderCreatedTime: `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}` // Format as HH:MM:SS
-                        });
-
-                        alert("Folder created successfully!");
-                        location.reload();
-                    } catch (error) {
-                        console.error("Error adding folder: ", error.message);
-                        console.error("Error adding folder: ", error);
-                        alert("Failed to create folder.");
-                        location.reload();
-                    }
-                }
-            }
-        });
         
         return folder;
     }
@@ -220,19 +219,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const foldersRef = collection(userRef, 'folders');
                     
                     // Fetch all folder documents
-                    const folderSnapshot = await getDocs(foldersRef);
-                    const folderList = [];
+                    const folderNameSnapshot = await getDocs(foldersRef);
+                    const folderNameList = [];
 
-                    folderSnapshot.forEach((doc) => {
+                    folderNameSnapshot.forEach((doc) => {
                         // Push the folder data to the array
-                        folderList.push({ id: doc.id, ...doc.data() });
+                        folderNameList.push({ id: doc.id });
                     });
 
-                    // Now you have an array of folders
-                    console.log("Folders retrieved: ", folderList);
+                    const folderIdsArray = folderNameList.map(folder => folder.id);
+                    // Loop through each ID in the array and append it to itemContainer
+                    folderIdsArray.forEach(folderId => {
+                        itemContainer.appendChild(createItem(folderId));
+                    });
                     
                     // You can also update the UI or perform other actions with the folderList
-                    return folderList; // Return or process the folderList as needed
+                    return folderNameList; // Return or process the folderList as needed
                 } catch (error) {
                     console.error("Error retrieving folders: ", error.message);
                 }
@@ -243,14 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Call the getFolders function to retrieve and log folders
     getFolders();
 
-    // Function to add multiple folder to the container
-    function addFolders() {
-        itemContainer.appendChild(createItem('GET THE ID OF COLLECTION'));
-
-                    
-            
-    }
-    
     // Event listener for infinite scrolling
     function handleScroll() {
         const { scrollTop, scrollHeight, clientHeight } = itemContainer;
@@ -260,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Initialize the list with initial items and set up scroll listener
-    addFolders();
     itemContainer.addEventListener("scroll", handleScroll);
 });
 
@@ -291,12 +284,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Function to add multiple items to the container
-    function addItems(count = 20) {
+    function addItems(count = 3) {
         const currentCount = itemContainer.childElementCount;
         for (let i = 0; i < count; i++) {
             itemContainer.appendChild(createItem(currentCount + i));
         }
     }
+    addItems();
     
     // Event listener for infinite scrolling
     function handleScroll() {
@@ -307,7 +301,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Initialize the list with initial items and set up scroll listener
-    addItems();
     itemContainer.addEventListener("scroll", handleScroll);
 });
 
