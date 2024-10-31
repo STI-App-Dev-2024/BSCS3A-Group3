@@ -55,7 +55,6 @@ signupForm.addEventListener('submit', async(e) => {
             middleName: middleName || ``,
             lastName: lastName,
             email: email
-
         });
         
         //go to homepage or dashboard

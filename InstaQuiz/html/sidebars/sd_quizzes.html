@@ -36,12 +36,14 @@
 
             <div class="user-profile">
                 <span class="user-icon">&#128100;</span>
-                <span class="user-name">Hello, [User Name]!</span>
-
+                <span class="user-name">...</span>
                 <div class="profile-drawer" id="profileDrawer">
                     <a href="#" class="profile">Profile</a>
                     <a href="#" class="logout">Logout</a>
                 </div>
+                <a class="arrow-icon">
+                    <img src="../Images/down_arrow.png" alt="Down Arrow" class="down-arrow">
+                </a>
             </div>
         </header>
 
@@ -49,15 +51,43 @@
             <h1>Manage Quiz</h1>
             <div class="layer1">
                 <h2>Root</h2>
-                <h2 class="new-folder"> <img src="../../images/newfolder.png" alt="newfolder icon" id="newfolderIcon" style="width: 30px; height: 25px;"> </h2>
-                <h2 >New Folder</h2>
+
+                <!-- New Folder Button -->
+                <h2 id="openNewFolderBtn" class="new-folder">
+                    <img src="../../images/newfolder.png" alt="newfolder icon" id="newfolderIcon" style="width: 30px; height: 25px;"> 
+                    New Folder
+                </h2>
+                
             </div>
 
-            <button id="openModalBtn">Create Quiz</button>
+            <!-- Folder and files container -->
+            <div class="ficontainer">
+
+                <div id="folderContainer"> </div>
+                <div id="itemContainer"> </div>
+
+            </div>
+
+
+            <!-- The New Folder Modal -->
+            <div id="myNewFolderModal" class="newFolderModal">
+                <div class="new-folder-modal-content">
+                    <p>New Folder</p>
+                    <input type="text" id="newFolderInput" name="newFolderInput" placeholder="Untitled folder">
+                    <div class ="create-folder-buttons">
+                    <button class="cancel-btn" id="cancelBtn">Cancel</button>
+                    <button class="create-folder-btn" id="createBtn">Create</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Create Quiz Button -->
+            <button id="openCreateQuizBtn">Create Quiz</button>
 
             <!-- The Create Quiz Modal -->
-            <div id="myModal" class="modal">
-                <div class="modal-content">
+            <div id="myCreateQuizModal" class="createQuizModal">
+                <div class="create-quiz-modal-content">
                     
                     <p>Convert PDF to Quiz</p>
                     <p1>Click the box or drag your file into it to convert your PDF into an interactive quiz!</p1>

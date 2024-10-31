@@ -3,7 +3,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { getAuth, onAuthStateChanged,EmailAuthProvider, updatePassword, reauthenticateWithCredential } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, updateDoc, } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
-
 // Firebase configuration
 import { firebaseConfig } from '../js/firebase.js';
 
@@ -136,7 +135,7 @@ function createModal() {
     modalContent.style.borderRadius = '10px';
     modalContent.style.width = '32%';
     modalContent.style.boxSizing = 'border-box';
-    modalContent.style.boxShadow = '0px 0px 50px rgba(0, 0, 0, 0.8)';
+    modalContent.style.boxShadow = '0px 0px 50px rgba(0, 0, 0, 0.4)';
 
     // Close button (span)
     var closeButton = document.createElement('span');
@@ -483,12 +482,13 @@ function createModal() {
         location.reload();
     };
 
-    // Close the modal when clicking outside of the modal content
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            location.reload();
+    // Close the modal when clicking anywhere outside of the modal content
+    window.addEventListener('click', function(event) {
+        // Check if the target is the modal background
+        if (event.target === modal) {
+            modal.style.display = "none";
         }
-    };
+    });
     
     // Edit profile button when clicked
     editProfileButton.onclick = function() {

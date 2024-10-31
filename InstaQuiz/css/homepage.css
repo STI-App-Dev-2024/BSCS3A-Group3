@@ -118,8 +118,8 @@ header {
 
 .arrow-icon img {
     margin-top: 8px;
-    width: 20px; /* Makes the image responsive */
-    height: auto; /* Maintains aspect ratio */
+    width: 20px;
+    height: auto;
 }
 
 .logout {

@@ -1,3 +1,18 @@
+// Import Modules
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+import { getFirestore, doc, addDoc, collection, getDocs, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+
+// Firebase configuration
+import { firebaseConfig } from '../firebase.js';
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
 // Drag and Drop functionality
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -82,22 +97,217 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Create quiz button function
+// New folder button mouseover
+var newFolderBtn = document.getElementById("openNewFolderBtn");
+var newFolderIcon = document.getElementById("newfolderIcon");
+newFolderBtn.onmouseover = function(event) {
+    newFolderIcon.src = "../../images/newfoldergreen.png";
+    newFolderBtn.style.color = "#4caf50";
+}
+
+// New folder button mouseout
+var newFolderBtn = document.getElementById("openNewFolderBtn");
+var newFolderIcon = document.getElementById("newfolderIcon");
+newFolderBtn.onmouseout = function(event) {
+    newFolderIcon.src = "../../images/newfolder.png";
+    newFolderBtn.style.color = "";
+}
+
+//Modals & functions
 document.addEventListener('DOMContentLoaded', () => {
-// Get the modal and the button
-var modal = document.getElementById("myModal");
-var btn = document.getElementById("openModalBtn");
-var closeBtn = document.querySelector(".close-btn");
 
-// Open the modal when the button is clicked
-btn.onclick = function() {
-modal.style.display = "flex";
-}
-
-// Close the modal when clicking anywhere outside of the modal content
-window.onclick = function(event) {
-if (event.target == modal) {
-    modal.style.display = "none";
+    // Function to handle opening and closing modals
+    function setupModal(modalId, buttonId, cancelBtnId = null) {
+        var modal = document.getElementById(modalId);
+        var btn = document.getElementById(buttonId);
+        var cancelBtn = cancelBtnId ? document.getElementById(cancelBtnId) : null;
+    
+        // Function to close the modal
+        function closeModal() {
+            modal.style.display = "none";
+        }
+    
+        // Open the modal when the button is clicked
+        btn.onclick = function() {
+            modal.style.display = "flex";
+        }
+    
+        // Closes the modal when the cancel button is clicked, if it exists
+        if (cancelBtn) {
+            cancelBtn.onclick = closeModal;
+        }
+    
+        // Close the modal when clicking anywhere outside of the modal content
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
     }
-}
+    
+    // Opens the New Folder modal
+    setupModal("myNewFolderModal", "openNewFolderBtn", "cancelBtn");
+    
+    // Opens the Create Quiz modal
+    setupModal("myCreateQuizModal", "openCreateQuizBtn");
+    
 });
+
+
+// Folder creation function
+document.addEventListener('DOMContentLoaded', () => {
+    const itemContainer = document.getElementById("folderContainer");
+
+    // Function to create a single item element
+    function createItem(index) {
+        const folder = document.createElement("div");
+        const createFolder = document.getElementById("createBtn"); 
+
+        folder.classList.add("folder"); // for css
+
+        // Folder image element
+        const img = document.createElement("img");
+        img.src = "../../images/folder.png";
+        img.alt = `Folder ${index + 1} Image`;
+        img.classList.add("folder-image-ff"); // for css
+
+        // Text element
+        const text = document.createElement("span");
+        text.textContent = `${index}`;
+        text.classList.add("folder-text-ff");
+
+        folder.appendChild(img);
+        folder.appendChild(text);
+
+        // Adding folder function
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                createFolder.onclick = async function() {
+                    try {
+                        const userRef = doc(db, 'users', user.uid);
+                        const foldersRef = collection(userRef, 'folders');
+                        const folderName = document.getElementById("newFolderInput").value;
+                        const folderDocRef = doc(foldersRef, folderName); 
+                        const date = new Date();
+
+                        // Use addDoc to add a new document to the folders collection
+                        await setDoc(folderDocRef, {
+                            folderCreatedDate: `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
+                            folderCreatedTime: `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}` // Format as HH:MM:SS
+                        });
+
+                        alert("Folder created successfully!");
+                        location.reload();
+                    } catch (error) {
+                        console.error("Error adding folder: ", error.message);
+                        console.error("Error adding folder: ", error);
+                        alert("Failed to create folder.");
+                        location.reload();
+                    }
+                }
+            }
+        });
+        
+        return folder;
+    }
+
+    // Fetch folders in firestore
+    const getFolders = async () => {
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userRef = doc(db, 'users', user.uid);
+                    const foldersRef = collection(userRef, 'folders');
+                    
+                    // Fetch all folder documents
+                    const folderSnapshot = await getDocs(foldersRef);
+                    const folderList = [];
+
+                    folderSnapshot.forEach((doc) => {
+                        // Push the folder data to the array
+                        folderList.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    // Now you have an array of folders
+                    console.log("Folders retrieved: ", folderList);
+                    
+                    // You can also update the UI or perform other actions with the folderList
+                    return folderList; // Return or process the folderList as needed
+                } catch (error) {
+                    console.error("Error retrieving folders: ", error.message);
+                }
+            }
+        });
+    };
+
+    // Call the getFolders function to retrieve and log folders
+    getFolders();
+
+    // Function to add multiple folder to the container
+    function addFolders() {
+        itemContainer.appendChild(createItem('GET THE ID OF COLLECTION'));
+
+                    
+            
+    }
+    
+    // Event listener for infinite scrolling
+    function handleScroll() {
+        const { scrollTop, scrollHeight, clientHeight } = itemContainer;
+        if (scrollTop + clientHeight >= scrollHeight - 10) {
+            addItems(10); // Load 10 more items when reaching the bottom
+        }
+    }
+    
+    // Initialize the list with initial items and set up scroll listener
+    addFolders();
+    itemContainer.addEventListener("scroll", handleScroll);
+});
+
+// item creation function
+document.addEventListener('DOMContentLoaded', () => {
+    const itemContainer = document.getElementById("itemContainer");
+
+    // Function to create a single item element
+    function createItem(index) {
+        const item = document.createElement("div");
+        item.classList.add("item");
+
+        // Folder image element
+        const img = document.createElement("img");
+        img.src = "../../images/item.png";
+        img.alt = `Item ${index + 1} Image`;
+        img.classList.add("item-image-ff"); // for css
+
+        // Text element
+        const text = document.createElement("span");
+        text.textContent = `Item ${index + 1}`;
+        text.classList.add("item-text-ff");
+
+        item.appendChild(img);
+        item.appendChild(text);
+
+        return item;
+    }
+
+    // Function to add multiple items to the container
+    function addItems(count = 20) {
+        const currentCount = itemContainer.childElementCount;
+        for (let i = 0; i < count; i++) {
+            itemContainer.appendChild(createItem(currentCount + i));
+        }
+    }
+    
+    // Event listener for infinite scrolling
+    function handleScroll() {
+        const { scrollTop, scrollHeight, clientHeight } = itemContainer;
+        if (scrollTop + clientHeight >= scrollHeight - 10) {
+            addItems(10); // Load 10 more items when reaching the bottom
+        }
+    }
+    
+    // Initialize the list with initial items and set up scroll listener
+    addItems();
+    itemContainer.addEventListener("scroll", handleScroll);
+});
+
