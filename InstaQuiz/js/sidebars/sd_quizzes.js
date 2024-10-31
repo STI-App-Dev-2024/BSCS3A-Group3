@@ -159,28 +159,60 @@ onAuthStateChanged(auth, (user) => {
     const createFolder = document.getElementById("createBtn"); 
     if (user) {
         createFolder.onclick = async function() {
-            try {
-                const userRef = doc(db, 'users', user.uid);
-                const foldersRef = collection(userRef, 'folders');
-                const folderName = document.getElementById("newFolderInput").value;
-                const folderDocRef = doc(foldersRef, folderName); 
-                const date = new Date();
+            let folderName = document.getElementById("newFolderInput").value;
 
-                // Use addDoc to add a new document to the folders collection
-                await setDoc(folderDocRef, {
-                    folderCreatedDate: `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
-                    folderCreatedTime: `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}` // Format as HH:MM:SS
-                });
-                location.reload();
-            } catch (error) {
-                console.error("Error adding folder: ", error.message);
-                console.error("Error adding folder: ", error);
-                alert("Failed to create folder.");
-                location.reload();
+            // Use a unique folder name based on the user input
+            if (folderName == "") {
+                folderName = "Untitled folder"; // Default name if input is empty
+            }
+            folderName = await getUniqueFolderName(folderName); // Get a unique name
+
+            await CreateFolder(folderName); // Pass the folderName to CreateFolder
+
+            async function CreateFolder(name) {
+                try {
+                    const userRef = doc(db, 'users', user.uid);
+                    const foldersRef = collection(userRef, 'folders');
+                    
+                    const folderDocRef = doc(foldersRef, name);
+                    const date = new Date();
+
+                    // Use setDoc to add a new document to the folders collection
+                    await setDoc(folderDocRef, {
+                        folderCreatedDate: `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
+                        folderCreatedTime: `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}` // Format as HH:MM:SS
+                    });
+                    location.reload();
+                    
+                } catch (error) {
+                    console.error("Error adding folder: ", error.message);
+                    console.error("Error adding folder: ", error);
+                    alert("Failed to create folder.");
+                }
             }
         }
     }
 });
+
+// Function to get a unique folder name based on user input
+async function getUniqueFolderName(baseName) {
+    const userRef = doc(db, 'users', auth.currentUser.uid);
+    const foldersRef = collection(userRef, 'folders');
+    
+    const querySnapshot = await getDocs(foldersRef);
+    const existingNames = querySnapshot.docs.map(doc => doc.id);
+    
+    let uniqueName = baseName;
+    let counter = 1;
+
+    // Check for existing folder names and create a unique name
+    while (existingNames.includes(uniqueName)) {
+        uniqueName = `${baseName} (${counter})`; 
+        counter++;
+    }
+
+    return uniqueName;
+}
 
 
 // Folder fetch and create function 
