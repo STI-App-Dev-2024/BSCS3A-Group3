@@ -83,7 +83,7 @@ document
       profileDrawer.style.display === ""
     ) {
       profileDrawer.style.display = "block";
-      downArrowImage.src = "../Images/up_arrow.png";
+      downArrowImage.src = "../images/up_arrow.png";
       userName.style.color = "#4caf50"; // Set color to green on click
       isClicked = true;
     } else {
@@ -91,7 +91,7 @@ document
       isClicked = false;
       if (!isClicked) {
         userName.style.color = "";
-        downArrowImage.src = "../Images/down_arrow.png";
+        downArrowImage.src = "../images/down_arrow.png";
       }
     }
   });
