@@ -662,7 +662,7 @@ document.querySelector('.logout').addEventListener('click', function(event) {
             window.location.href = '../html/welcome.html'; 
         }).catch((error) => {
             console.error("Logout error:", error);
-            alert("Error logging out. Please try again."); //try
+            alert("Error logging out. Please try again."); 
         });
     }
 });
