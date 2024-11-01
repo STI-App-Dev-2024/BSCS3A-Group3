@@ -1,14 +1,22 @@
 document.querySelector('.convert-btn').addEventListener('click', async () => {
     const questionCount = document.getElementById('questionCount').value;
-    const questionType = document.querySelector('input[name="questionType"]:checked').value;
+    const fileInput = document.getElementById('fileInput');
 
+    if (fileInput.files.length === 0) {
+        alert('Please upload a file before converting.');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    
+    const formData = new FormData();
+    formData.append('files[]', file);   
+    formData.append('questionCount', questionCount);
+    
     try {
         const response = await fetch('http://127.0.0.1:5000/convert', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ questionCount, questionType }),
+            body: formData,
         });
 
         if (!response.ok) {
@@ -16,6 +24,12 @@ document.querySelector('.convert-btn').addEventListener('click', async () => {
         }
 
         const data = await response.json();
+
+        
+        if (!data.questions || !Array.isArray(data.questions)) {
+            throw new Error('Invalid response format');
+        }
+
         displayQuestions(data.questions);
     } catch (error) {
         console.error('Error fetching questions:', error);
@@ -26,38 +40,41 @@ document.querySelector('.convert-btn').addEventListener('click', async () => {
 function displayQuestions(questions) {
     const content = document.querySelector('.content');
     content.innerHTML = '<h2>Quiz Questions</h2>';
-    
+
     questions.forEach((question, index) => {
         const questionElement = document.createElement('div');
-        questionElement.innerHTML = `<p>${index + 1}. ${question.question}</p>`;
         
-        if (question.type === 'multipleChoice') {
-            question.options.forEach(option => {
-                questionElement.innerHTML += `<label><input type="radio" name="question${index}" value="${option}"> ${option}</label>`;
-            });
-        } else if (question.type === 'fillInTheBlanks') {
-            questionElement.innerHTML += `<input type="text" placeholder="Your answer" name="question${index}">`;
-        } else if (question.type === 'trueFalse') {
-            questionElement.innerHTML += `<label><input type="radio" name="question${index}" value="True"> True</label>`;
-            questionElement.innerHTML += `<label><input type="radio" name="question${index}" value="False"> False</label>`;
-        }
+       
+        questionElement.innerHTML = `<p>${index + 1}. ${question.question}</p>`;
+
+       
+        question.options.forEach(option => {
+            questionElement.innerHTML += `<label><input type="radio" name="question${index}" value="${option}"> ${option}</label><br>`;
+        });
+
+       
         content.appendChild(questionElement);
     });
     
-    content.innerHTML += '<button id="submitBtn">Submit</button>';
+   
+    const submitButton = document.createElement('button');
+    submitButton.id = 'submitBtn';
+    submitButton.textContent = 'Submit';
+    content.appendChild(submitButton);
     
-    document.getElementById('submitBtn').addEventListener('click', () => {
+     
+    submitButton.addEventListener('click', () => {
         calculateScores(questions);
     });
 }
 
 async function calculateScores(questions) {
     const scores = {};
+
     questions.forEach((question, index) => {
-        const selected = document.querySelector(`input[name="question${index}"]:checked`) || 
-                         document.querySelector(`input[name="question${index}"]`).value;
-        if (selected) {
-            scores[`question${index}`] = selected.value || selected;
+        const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+        if (selectedOption) {
+            scores[`question${index}`] = selectedOption.value;
         }
     });
 
@@ -77,4 +94,3 @@ async function calculateScores(questions) {
         alert('Error submitting quiz. Please try again.');
     }
 }
-
