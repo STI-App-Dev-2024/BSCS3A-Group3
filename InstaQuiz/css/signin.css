@@ -33,13 +33,6 @@ nav {
 #clickable-logo {
     text-decoration: none; 
     user-select: none; 
-}
-
-#clickable-logo:visited {
-    color: inherit; 
-}
-
-#clickable-logo:hover {
     cursor: pointer; 
 }
 
