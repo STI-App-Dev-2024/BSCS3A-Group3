@@ -124,7 +124,7 @@ document.addEventListener("click", function (event) {
 
   if (!userProfile.contains(event.target)) {
     profileDrawer.style.display = "none";
-    downArrowImage.src = "../Images/down_arrow.png";
+    downArrowImage.src = "../images/down_arrow.png";
     const userName = userProfile.querySelector(".user-name");
     userName.style.color = "";
     isClicked = false;
