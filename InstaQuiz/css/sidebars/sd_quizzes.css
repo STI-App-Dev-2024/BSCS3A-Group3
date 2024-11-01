@@ -177,6 +177,17 @@ h2 {
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
+    transition: opacity 0.3s ease;;
+    opacity: 0;
+}
+
+.newFolderModal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.newFolderModal.hide {
+    opacity: 0;
 }
 
 .ffcontainer {
@@ -400,6 +411,8 @@ h2 {
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
+    transition: opacity 0.3s ease;;
+    opacity: 0;
 }
 
 /* Create Quiz modal content */
@@ -413,6 +426,15 @@ h2 {
     text-align: center;
     overflow-y: auto;
     border-radius: 8px;
+}
+
+.createQuizModal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.createQuizModal.hide {
+    opacity: 0;
 }
 
 /* Convert PDF to QUIZ text */

@@ -91,6 +91,7 @@ document
       isClicked = false;
       if (!isClicked) {
         userName.style.color = "";
+        downArrowImage.src = "../Images/down_arrow.png";
       }
     }
   });
@@ -490,26 +491,28 @@ function createModal() {
 
   // Open the modal when the button is clicked
   document.querySelector(".profile").onclick = function () {
-    modal.style.display = "block"; // Set display to block
+    modal.style.display = "block";
     setTimeout(function () {
-      modal.style.opacity = "1"; // Fade in effect
-    }, 10); // Small delay to trigger CSS transition
+      modal.style.opacity = "1";
+    }, 10);
   };
 
   // Close the modal with fade-out effect
   closeButton.onclick = function () {
     modal.style.opacity = "0"; // Fade out effect
     setTimeout(function () {
-      modal.style.display = "none"; // Hide after fade-out completes
-    }, 500); // Match this time with the duration of the fade-out transition
+      modal.style.display = "none";
+      location.reload();
+    }, 500);
   };
 
   // Close the modal when clicking anywhere outside of the modal content
   window.addEventListener("click", function (event) {
     if (event.target === modal) {
-      modal.style.opacity = "0"; // Fade out effect
+      modal.style.opacity = "0";
       setTimeout(function () {
-        modal.style.display = "none"; // Hide after fade-out completes
+        modal.style.display = "none";
+        location.reload();
       }, 500);
     }
   });
