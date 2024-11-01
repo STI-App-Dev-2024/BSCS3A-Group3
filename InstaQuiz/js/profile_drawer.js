@@ -689,8 +689,11 @@ document.querySelector(".logout").addEventListener("click", function (event) {
     auth
       .signOut()
       .then(() => {
-        alert("Logged out successfully!");
-        window.location.href = "../html/welcome.html";
+        // Delay the success alert for 1 second (1000 milliseconds)
+        setTimeout(() => {
+          alert("Logged out successfully!");
+          window.location.href = "../html/welcome.html";
+        }, 3000);
       })
       .catch((error) => {
         console.error("Logout error:", error);
@@ -698,3 +701,4 @@ document.querySelector(".logout").addEventListener("click", function (event) {
       });
   }
 });
+
