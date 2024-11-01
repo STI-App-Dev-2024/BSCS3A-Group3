@@ -28,6 +28,10 @@ nav {
     color: #4CAF50; 
 }
 
+.no-highlight {
+    color: #333333; 
+}
+
 
 /* Sico's Note: Naki-click yung logo para bumalik sa Home page */
 #clickable-logo {
