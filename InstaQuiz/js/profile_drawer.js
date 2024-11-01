@@ -651,14 +651,18 @@ function createModal() {
 // Call the function to create the profile modal
 createModal();
 
-// Logout function
+// logout function
 document.querySelector('.logout').addEventListener('click', function(event) {
     event.preventDefault();
-    // Confirm logout action
+    // confirm logout action
     if (confirm("Are you sure you want to logout?")) {
-        alert("Logged out successfully!");
-        window.location.href = '../html/welcome.html'; // if you're in the same directory
+        // log out from Firebase
+        auth.signOut().then(() => {
+            alert("Logged out successfully!");
+            window.location.href = '../html/welcome.html'; 
+        }).catch((error) => {
+            console.error("Logout error:", error);
+            alert("Error logging out. Please try again.");
+        });
     }
 });
-
-
