@@ -260,6 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const folder = document.createElement("div");
 
     folder.classList.add("folder"); // for css
+    folder.id = `${index}`;
 
     // Folder image element
     const img = document.createElement("img");
