@@ -31,6 +31,7 @@ nav {
 
 /* Sico's Note: Naki-click yung logo para bumalik sa Home page */
 #clickable-logo {
+    color:#333;
     text-decoration: none; 
     user-select: none; 
     cursor: pointer; 

@@ -63,15 +63,9 @@ body {
 
 /* Sico's Note: Naki-click yung logo para bumalik sa Home page */
 #clickable-logo {
+    color:#333;
     text-decoration: none; 
     user-select: none; 
-}
-
-#clickable-logo:visited {
-    color: inherit; 
-}
-
-#clickable-logo:hover {
     cursor: pointer; 
 }
 
