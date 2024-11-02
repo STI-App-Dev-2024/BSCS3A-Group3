@@ -373,9 +373,13 @@ document.addEventListener("DOMContentLoaded", () => {
   itemContainer.addEventListener("scroll", handleScroll);
 });
 
+// TO BE RESUMED BY brrtttt
 // Function to handle click events (this gets the id of an element clicked.)
 function handleClick(event) {
   const elementId = event.target.id;
+
+  // LOGIC: mag lagay ng function na kung saan dipende sa 'elementId' or yung folder-id kung ano ang ifefetch nya.
+
   console.log(`Clicked element ID: ${elementId}`);
 }
 
