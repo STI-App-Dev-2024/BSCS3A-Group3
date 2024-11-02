@@ -372,3 +372,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize the list with initial items and set up scroll listener
   itemContainer.addEventListener("scroll", handleScroll);
 });
+
+// Function to handle click events (this gets the id of an element clicked.)
+function handleClick(event) {
+  const elementId = event.target.id;
+  console.log(`Clicked element ID: ${elementId}`);
+}
+
+// Get all elements you want to listen for clicks on
+const elements = document.querySelectorAll("div");
+
+// Add click event listener to each element
+elements.forEach((element) => {
+  element.addEventListener("click", handleClick);
+});
