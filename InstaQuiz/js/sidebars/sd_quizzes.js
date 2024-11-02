@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Folder image element
     const img = document.createElement("img");
     img.src = "../../images/folder.png";
-    img.alt = `Folder ${index + 1} Image`;
+    img.alt = `${index}`;
     img.classList.add("folder-image-ff"); // for css
 
     // Text element
