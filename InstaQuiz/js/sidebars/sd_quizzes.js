@@ -12,6 +12,8 @@ import {
   getDocs,
   setDoc,
   updateDoc,
+  query,
+  where,
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Firebase configuration
@@ -206,6 +208,7 @@ onAuthStateChanged(auth, (user) => {
 
           // Use setDoc to add a new document to the folders collection
           await setDoc(folderDocRef, {
+            fileType: "folder",
             folderCreatedDate: `${(date.getMonth() + 1)
               .toString()
               .padStart(2, "0")}/${date
@@ -279,21 +282,23 @@ document.addEventListener("DOMContentLoaded", () => {
     return folder;
   }
 
-  // Fetch folders in firestore
-  const getFolders = async () => {
+  // Fetch folders in Firestore
+  const getRootFolders = async () => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
           const userRef = doc(db, "users", user.uid);
-          const foldersRef = collection(userRef, "folders");
+          const root = collection(userRef, "folders");
 
-          // Fetch all folder documents
-          const folderNameSnapshot = await getDocs(foldersRef);
+          // Query only documents with fileType: "folder"
+          const queryFolders = query(root, where("fileType", "==", "folder"));
+          const folderNameSnapshot = await getDocs(queryFolders);
+
           const folderNameList = [];
 
           folderNameSnapshot.forEach((doc) => {
             // Push the folder data to the array
-            folderNameList.push({ id: doc.id });
+            folderNameList.push({ id: doc.id, ...doc.data() });
           });
 
           const folderIdsArray = folderNameList.map((folder) => folder.id);
@@ -311,8 +316,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // Call the getFolders function to retrieve and log folders
-  getFolders();
+  // Call the getRootFolders function to retrieve and log folders
+  getRootFolders();
 
   // Event listener for infinite scrolling
   function handleScroll() {
@@ -326,7 +331,101 @@ document.addEventListener("DOMContentLoaded", () => {
   itemContainer.addEventListener("scroll", handleScroll);
 });
 
-// item creation function
+// TO BE RESUMED BY brrtttt
+// Function to handle click events (this gets the id of an element clicked.)
+function handleClick(event) {
+  const elementId = event.target.id;
+
+  const folderContainer = document.getElementById("folderContainer");
+
+  // Function to create a single item element
+  function createItem(index) {
+    const folder = document.createElement("div");
+
+    folder.classList.add("folder"); // for css
+    folder.id = `${index}`;
+
+    // Folder image element
+    const img = document.createElement("img");
+    img.src = "../../images/folder.png";
+    img.alt = `${index}`;
+    img.classList.add("folder-image-ff"); // for css
+
+    // Text element
+    const text = document.createElement("span");
+    text.textContent = `${index}`;
+    text.classList.add("folder-text-ff");
+
+    // Removes all previous folders
+    while (folder.firstChild) {
+      folder.removeChild(folder.firstChild);
+    }
+
+    folder.appendChild(img);
+    folder.appendChild(text);
+
+    // This allows only 1 click to avoid multiple fetch of folders
+    element.removeEventListener("click", handleClick);
+
+    return folder;
+  }
+
+  // Fetch clicked folders
+  const getClickedFolders = async () => {
+    // Remove all folders from the previous folder
+    while (folderContainer.firstChild) {
+      folderContainer.removeChild(folderContainer.firstChild);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const root = collection(userRef, "folders");
+          const folderDocRef = doc(root, elementId); // Ensure this is a document
+          const rootClickedFolder = collection(folderDocRef, "folders"); // Reference to sub-collection under that specific folder document
+
+          // Query only documents with fileType: "folder"
+          const queryFolders = query(
+            rootClickedFolder,
+            where("fileType", "==", "folder")
+          );
+          const folderNameSnapshot = await getDocs(queryFolders);
+
+          const folderNameList = [];
+
+          folderNameSnapshot.forEach((doc) => {
+            // Push the folder data to the array
+            folderNameList.push({ id: doc.id, ...doc.data() });
+          });
+
+          const folderIdsArray = folderNameList.map((folder) => folder.id);
+          // Loop through each ID in the array and append it to folderContainer
+          folderIdsArray.forEach((folderId) => {
+            folderContainer.appendChild(createItem(folderId));
+          });
+
+          // You can also update the UI or perform other actions with the folderList
+          return folderNameList; // Return or process the folderList as needed
+        } catch (error) {
+          console.error("Error retrieving folders: ", error.message);
+        }
+      }
+    });
+  };
+
+  // Call the getClickedFolders function to retrieve and log folders
+  getClickedFolders();
+  console.log(`Clicked element ID: ${elementId}`);
+}
+
+// Get the specific element you want to listen for clicks on
+const element = document.getElementById("folderContainer");
+
+// Add a click event listener to the element
+element.addEventListener("click", handleClick);
+
+/* // item creation function
 document.addEventListener("DOMContentLoaded", () => {
   const itemContainer = document.getElementById("itemContainer");
 
@@ -372,21 +471,4 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize the list with initial items and set up scroll listener
   itemContainer.addEventListener("scroll", handleScroll);
 });
-
-// TO BE RESUMED BY brrtttt
-// Function to handle click events (this gets the id of an element clicked.)
-function handleClick(event) {
-  const elementId = event.target.id;
-
-  // LOGIC: mag lagay ng function na kung saan dipende sa 'elementId' or yung folder-id kung ano ang ifefetch nya.
-
-  console.log(`Clicked element ID: ${elementId}`);
-}
-
-// Get all elements you want to listen for clicks on
-const elements = document.querySelectorAll("div");
-
-// Add click event listener to each element
-elements.forEach((element) => {
-  element.addEventListener("click", handleClick);
-});
+*/
