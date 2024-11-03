@@ -183,6 +183,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModal("myCreateQuizModal", "openCreateQuizBtn");
 });
 
+// NOTE: GAWING DYNAMIC ANG LOCATION PAG FETCH AT CREATE NG FOLDER
+
 // Folder creation function
 onAuthStateChanged(auth, (user) => {
   const createFolder = document.getElementById("createBtn");
@@ -331,7 +333,6 @@ document.addEventListener("DOMContentLoaded", () => {
   itemContainer.addEventListener("scroll", handleScroll);
 });
 
-// TO BE RESUMED BY brrtttt
 // Function to handle click events (this gets the id of an element clicked.)
 function handleClick(event) {
   const elementId = event.target.id;
@@ -363,9 +364,6 @@ function handleClick(event) {
 
     folder.appendChild(img);
     folder.appendChild(text);
-
-    // This allows only 1 click to avoid multiple fetch of folders
-    element.removeEventListener("click", handleClick);
 
     return folder;
   }
