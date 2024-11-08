@@ -183,8 +183,54 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModal("myCreateQuizModal", "openCreateQuizBtn");
 });
 
-// NOTE: GAWING DYNAMIC ANG LOCATION PAG FETCH AT CREATE NG FOLDER
+// item creation function
+document.addEventListener("DOMContentLoaded", () => {
+  const itemContainer = document.getElementById("itemContainer");
 
+  // Function to create a single item element
+  function createItem(index) {
+    const item = document.createElement("div");
+    item.classList.add("item");
+
+    // Folder image element
+    const img = document.createElement("img");
+    img.src = "../../images/item.png";
+    img.alt = `Item ${index + 1} Image`;
+    img.classList.add("item-image-ff"); // for css
+
+    // Text element
+    const text = document.createElement("span");
+    text.textContent = `Quiz ${index + 1}`;
+    text.classList.add("item-text-ff");
+
+    item.appendChild(img);
+    item.appendChild(text);
+
+    return item;
+  }
+
+  // Function to add multiple items to the container
+  function addItems(count = 3) {
+    const currentCount = itemContainer.childElementCount;
+    for (let i = 0; i < count; i++) {
+      itemContainer.appendChild(createItem(currentCount + i));
+    }
+  }
+  addItems();
+
+  // Event listener for infinite scrolling
+  function handleScroll() {
+    const { scrollTop, scrollHeight, clientHeight } = itemContainer;
+    if (scrollTop + clientHeight >= scrollHeight - 10) {
+      addItems(10); // Load 10 more items when reaching the bottom
+    }
+  }
+
+  // Initialize the list with initial items and set up scroll listener
+  itemContainer.addEventListener("scroll", handleScroll);
+});
+
+/* POSTPONE
 // Folder creation function
 onAuthStateChanged(auth, (user) => {
   const createFolder = document.getElementById("createBtn");
@@ -205,12 +251,12 @@ onAuthStateChanged(auth, (user) => {
           const userRef = doc(db, "users", user.uid);
           const foldersRef = collection(userRef, "folders");
 
-          const folderDocRef = doc(foldersRef, name);
           const date = new Date();
 
           // Use setDoc to add a new document to the folders collection
-          await setDoc(folderDocRef, {
-            fileType: "folder",
+          await addDoc(foldersRef, {
+            parent: "root",
+            folderName: folderName,
             folderCreatedDate: `${(date.getMonth() + 1)
               .toString()
               .padStart(2, "0")}/${date
@@ -255,7 +301,7 @@ async function getUniqueFolderName(baseName) {
 
   return uniqueName;
 }
-
+  
 // Folder fetch and create function
 document.addEventListener("DOMContentLoaded", () => {
   const itemContainer = document.getElementById("folderContainer");
@@ -292,9 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const userRef = doc(db, "users", user.uid);
           const root = collection(userRef, "folders");
 
-          // Query only documents with fileType: "folder"
-          const queryFolders = query(root, where("fileType", "==", "folder"));
-          const folderNameSnapshot = await getDocs(queryFolders);
+          const folderNameSnapshot = await getDocs(root);
 
           const folderNameList = [];
 
@@ -422,51 +466,4 @@ const element = document.getElementById("folderContainer");
 
 // Add a click event listener to the element
 element.addEventListener("click", handleClick);
-
-/* // item creation function
-document.addEventListener("DOMContentLoaded", () => {
-  const itemContainer = document.getElementById("itemContainer");
-
-  // Function to create a single item element
-  function createItem(index) {
-    const item = document.createElement("div");
-    item.classList.add("item");
-
-    // Folder image element
-    const img = document.createElement("img");
-    img.src = "../../images/item.png";
-    img.alt = `Item ${index + 1} Image`;
-    img.classList.add("item-image-ff"); // for css
-
-    // Text element
-    const text = document.createElement("span");
-    text.textContent = `Item ${index + 1}`;
-    text.classList.add("item-text-ff");
-
-    item.appendChild(img);
-    item.appendChild(text);
-
-    return item;
-  }
-
-  // Function to add multiple items to the container
-  function addItems(count = 3) {
-    const currentCount = itemContainer.childElementCount;
-    for (let i = 0; i < count; i++) {
-      itemContainer.appendChild(createItem(currentCount + i));
-    }
-  }
-  addItems();
-
-  // Event listener for infinite scrolling
-  function handleScroll() {
-    const { scrollTop, scrollHeight, clientHeight } = itemContainer;
-    if (scrollTop + clientHeight >= scrollHeight - 10) {
-      addItems(10); // Load 10 more items when reaching the bottom
-    }
-  }
-
-  // Initialize the list with initial items and set up scroll listener
-  itemContainer.addEventListener("scroll", handleScroll);
-});
 */
