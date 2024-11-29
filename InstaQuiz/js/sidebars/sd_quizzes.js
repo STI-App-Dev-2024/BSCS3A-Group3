@@ -13,6 +13,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   query,
   where,
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
@@ -218,8 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Settings clicked
     let windowDiv = null; // Variable to hold the created window
     settingsImg.addEventListener("click", function (event) {
-      console.log("Settings image clicked");
-
       // Check if the window already exists
       if (windowDiv) {
         // If the window exists, hide it
@@ -270,7 +269,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // Button click event to show alert
           button.addEventListener("click", () => {
-            alert(`You chose: ${choice}`);
+            if (choice == "Cut") {
+              alert("you chose cut");
+            }
+
+            if (choice == "Copy") {
+              alert("you chose copy");
+            }
+
+            if (choice == "Delete") {
+              const isConfirmed = confirm("Are you sure you want to delete?");
+              if (isConfirmed) {
+                onAuthStateChanged(auth, async (user) => {
+                  if (user) {
+                    try {
+                      const userRef = doc(db, "users", user.uid);
+                      const foldersRef = collection(userRef, "folders");
+                      const folderRef = doc(foldersRef, folderId);
+
+                      await deleteDoc(folderRef);
+
+                      location.reload();
+                    } catch (error) {
+                      console.error("Error deleting document: ", error);
+                    }
+                  }
+                });
+              } else {
+                // Cancel deletion
+              }
+            }
+
+            if (choice == "Rename") {
+              alert("you chose rename");
+            }
+            // hides window
+            windowDiv.style.display = "none";
+            windowDiv = null;
           });
 
           bodyDiv.appendChild(button);
@@ -373,7 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const itemContainer = document.getElementById("itemContainer");
 
   // Function to create a single item element
-  function createItem(folderId, quizName) {
+  function createItem(quizId, quizName) {
     const item = document.createElement("div");
 
     item.classList.add("item"); // for css
@@ -381,7 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Quiz image element
     const img = document.createElement("img");
     img.src = "../../images/item.png";
-    img.alt = `${folderId}`;
+    img.alt = `${quizId}`;
     img.classList.add("item-image-ff"); // for css
 
     // Text element
@@ -395,16 +430,14 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsImg.classList.add("settings-image-ff"); // for css
 
     // Settings clicked
-    let windowDiv = null; // Variable to hold the created window
+    let windowDiv = null;
     settingsImg.addEventListener("click", function (event) {
-      console.log("Settings image clicked");
-
       // Check if the window already exists
       if (windowDiv) {
         // If the window exists, hide it
         windowDiv.style.display = "none";
-        windowDiv = null; // Reset the windowDiv to null to track the state
-        return; // Exit the function if the window is being hidden
+        windowDiv = null;
+        return;
       }
 
       // Create the window
@@ -449,7 +482,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // Button click event to show alert
           button.addEventListener("click", () => {
-            alert(`You chose: ${choice}`);
+            if (choice == "Cut") {
+              alert("you chose cut");
+            }
+
+            if (choice == "Copy") {
+              alert("you chose copy");
+            }
+
+            if (choice == "Delete") {
+              const isConfirmed = confirm("Are you sure you want to delete?");
+              if (isConfirmed) {
+                onAuthStateChanged(auth, async (user) => {
+                  if (user) {
+                    try {
+                      const userRef = doc(db, "users", user.uid);
+                      const quizzesRef = collection(userRef, "quizzes");
+                      const quizRef = doc(quizzesRef, quizId);
+
+                      await deleteDoc(quizRef);
+
+                      location.reload();
+                    } catch (error) {
+                      console.error("Error deleting document: ", error);
+                    }
+                  }
+                });
+              } else {
+                // Cancel deletion
+              }
+            }
+
+            if (choice == "Rename") {
+              alert("you chose rename");
+            }
+
+            // hides window
+            windowDiv.style.display = "none";
+            windowDiv = null;
           });
 
           bodyDiv.appendChild(button);
@@ -467,7 +537,7 @@ document.addEventListener("DOMContentLoaded", () => {
             event.target !== settingsImg
           ) {
             windowDiv.style.display = "none";
-            windowDiv = null; // Reset the windowDiv to null after closing
+            windowDiv = null;
             document.removeEventListener("click", closeWindow); // Remove the event listener after closing
           }
         });
@@ -479,7 +549,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const windowWidth = windowDiv.offsetWidth;
           windowDiv.style.position = "absolute";
           windowDiv.style.top = `${mouseY}px`;
-          windowDiv.style.left = `${mouseX - windowWidth}px`; // Position it to the left of the cursor
+          windowDiv.style.left = `${mouseX - windowWidth}px`;
           windowDiv.style.zIndex = "1000";
         });
       };
@@ -563,7 +633,7 @@ onAuthStateChanged(auth, (user) => {
       }
       folderName = await getUniqueFolderName(folderName); // Get a unique name
 
-      await CreateFolder(folderName); // Pass the folderName to CreateFolder
+      await CreateFolder(folderName);
 
       async function CreateFolder(name) {
         try {
@@ -572,7 +642,6 @@ onAuthStateChanged(auth, (user) => {
 
           const date = new Date();
 
-          // Use setDoc to add a new document to the folders collection
           await addDoc(foldersRef, {
             parent: "root",
             folderName: folderName,
@@ -697,16 +766,16 @@ async function getUniqueFolderName(baseName) {
 // fetch quiz on folder function (used this function to fetch quizzes on current folder location)
 const fetchQuizOnFolder = async () => {
   // Function to create a single item element
-  function createItem(folderName, quizName) {
+  function createItem(quizId, quizName) {
     const item = document.createElement("div");
 
     item.classList.add("item"); // for css
-    item.id = `${folderName}`;
+    item.id = `${quizId}`;
 
     // Folder image element
     const img = document.createElement("img");
     img.src = "../../images/item.png";
-    img.alt = `${folderName}`;
+    img.alt = `${quizId}`;
     img.classList.add("item-image-ff"); // for css
 
     // Text element
@@ -718,6 +787,138 @@ const fetchQuizOnFolder = async () => {
     const settingsImg = document.createElement("img");
     settingsImg.src = "../../images/settings.png";
     settingsImg.classList.add("settings-image-ff"); // for css
+
+    // Settings clicked
+    let windowDiv = null; // Variable to hold the created window
+    settingsImg.addEventListener("click", function (event) {
+      // Check if the window already exists
+      if (windowDiv) {
+        // If the window exists, hide it
+        windowDiv.style.display = "none";
+        windowDiv = null;
+        return;
+      }
+
+      // Create the window
+      const createWindow = () => {
+        // Create the window div
+        windowDiv = document.createElement("div");
+        windowDiv.style.width = "150px";
+        windowDiv.style.border = "1px solid #ccc";
+        windowDiv.style.borderRadius = "8px";
+        windowDiv.style.backgroundColor = "#f9f9f9";
+        windowDiv.style.boxShadow = "0px 4px 8px rgba(0, 0, 0, 0.1)";
+        windowDiv.style.overflow = "hidden";
+
+        // Create the window body
+        const bodyDiv = document.createElement("div");
+        bodyDiv.style.padding = "10px";
+        bodyDiv.style.textAlign = "center";
+
+        // Create the buttons for choices
+        const choices = ["Cut", "Copy", "Delete", "Rename"];
+        choices.forEach((choice) => {
+          const button = document.createElement("button");
+          button.innerHTML = choice;
+          button.style.width = "100%";
+          button.style.padding = "10px";
+          button.style.margin = "5px 0";
+          button.style.color = "black";
+          button.style.backgroundColor = "#f9f9f9";
+          button.style.border = "none";
+          button.style.borderRadius = "4px";
+          button.style.cursor = "pointer";
+
+          // Button hover effect
+          button.addEventListener("mouseenter", () => {
+            button.style.backgroundColor = "#4caf50";
+            button.style.color = "white";
+          });
+          button.addEventListener("mouseleave", () => {
+            button.style.backgroundColor = "#f9f9f9";
+            button.style.color = "black";
+          });
+
+          // Button click event to show alert
+          button.addEventListener("click", () => {
+            if (choice == "Cut") {
+              alert("you chose cut");
+            }
+
+            if (choice == "Copy") {
+              alert("you chose copy");
+            }
+
+            if (choice == "Delete") {
+              console.log(currentLocationOnId, quizId);
+              const isConfirmed = confirm("Are you sure you want to delete?");
+              if (isConfirmed) {
+                onAuthStateChanged(auth, async (user) => {
+                  if (user) {
+                    try {
+                      const userRef = doc(db, "users", user.uid);
+                      const foldersRef = collection(userRef, "folders");
+                      const folderRef = doc(foldersRef, currentLocationOnId);
+                      const quizzesRef = collection(folderRef, "quizzes");
+                      const quiz1Ref = doc(quizzesRef, quizId);
+
+                      await deleteDoc(quiz1Ref);
+
+                      fetchQuizOnFolder();
+                    } catch (error) {
+                      console.error("Error deleting document: ", error);
+                    }
+                  }
+                });
+              } else {
+                // Cancel deletion
+              }
+            }
+
+            if (choice == "Rename") {
+              alert("you chose rename");
+            }
+
+            // hides window
+            windowDiv.style.display = "none";
+            windowDiv = null;
+          });
+
+          bodyDiv.appendChild(button);
+        });
+
+        windowDiv.appendChild(bodyDiv);
+
+        // Add the window to the document body
+        document.body.appendChild(windowDiv);
+
+        // Add event listener to close the window when clicking outside
+        document.addEventListener("click", function closeWindow(event) {
+          if (
+            !windowDiv.contains(event.target) &&
+            event.target !== settingsImg
+          ) {
+            windowDiv.style.display = "none";
+            windowDiv = null; // Reset the windowDiv to null after closing
+            document.removeEventListener("click", closeWindow); // Remove the event listener after closing
+          }
+        });
+
+        // Update the window position based on mouse movement
+        document.addEventListener("click", function (event) {
+          const mouseX = event.clientX;
+          const mouseY = event.clientY;
+          const windowWidth = windowDiv.offsetWidth;
+          windowDiv.style.position = "absolute";
+          windowDiv.style.top = `${mouseY}px`;
+          windowDiv.style.left = `${mouseX - windowWidth}px`;
+          windowDiv.style.zIndex = "1000";
+        });
+      };
+
+      // Call the function to create the window
+      createWindow();
+    });
 
     // Share image element
     const shareImg = document.createElement("img");
