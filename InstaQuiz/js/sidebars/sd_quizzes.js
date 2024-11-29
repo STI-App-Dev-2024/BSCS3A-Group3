@@ -478,21 +478,21 @@ async function getUniqueFolderName(baseName) {
 // fetch quiz on folder function (used this function to fetch quizzes on current folder location)
 const fetchQuizOnFolder = async () => {
   // Function to create a single item element
-  function createItem(index) {
+  function createItem(folderName, quizName) {
     const item = document.createElement("div");
 
     item.classList.add("item"); // for css
-    item.id = `${index}`;
+    item.id = `${folderName}`;
 
     // Folder image element
     const img = document.createElement("img");
     img.src = "../../images/item.png";
-    img.alt = `${index}`;
+    img.alt = `${folderName}`;
     img.classList.add("item-image-ff"); // for css
 
     // Text element
     const text = document.createElement("span");
-    text.textContent = `${index}`;
+    text.textContent = `${quizName}`;
     text.classList.add("item-text-ff");
 
     item.appendChild(img);
@@ -527,18 +527,15 @@ const fetchQuizOnFolder = async () => {
           const quizNameList = [];
 
           quizNameSnapshot.forEach((doc) => {
-            // Push the folder data to the array
             quizNameList.push({ id: doc.id, ...doc.data() });
           });
 
-          const quizIdsArray = quizNameList.map((folder) => folder.id);
-          // Loop through each ID in the array and append it to folderContainer
-          quizIdsArray.forEach((folderId) => {
-            itemContainer.appendChild(createItem(folderId));
+          quizNameList.forEach((item) => {
+            const { id, quizName } = item;
+            itemContainer.appendChild(createItem(id, quizName));
           });
 
-          // You can also update the UI or perform other actions with the folderList
-          return quizNameList; // Return or process the folderList as needed
+          return quizNameList;
         } catch (error) {
           console.error("Error retrieving item: ", error.message);
         }
