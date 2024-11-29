@@ -25,6 +25,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+let currentLocation = ["Root"];
+let currentLocationOnId = [];
+
 // Drag and Drop functionality
 document.addEventListener("DOMContentLoaded", () => {
   document
@@ -184,125 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModal("myCreateQuizModal", "openCreateQuizBtn");
 });
 
-// item creation function
-document.addEventListener("DOMContentLoaded", () => {
-  const itemContainer = document.getElementById("itemContainer");
-
-  // Function to create a single item element
-  function createItem(index) {
-    const item = document.createElement("div");
-    item.classList.add("item");
-
-    // Folder image element
-    const img = document.createElement("img");
-    img.src = "../../images/item.png";
-    img.alt = `Item ${index + 1} Image`;
-    img.classList.add("item-image-ff"); // for css
-
-    // Text element
-    const text = document.createElement("span");
-    text.textContent = `Quiz ${index + 1}`;
-    text.classList.add("item-text-ff");
-
-    item.appendChild(img);
-    item.appendChild(text);
-
-    return item;
-  }
-
-  // Function to add multiple items to the container
-  function addItems(count = 3) {
-    const currentCount = itemContainer.childElementCount;
-    for (let i = 0; i < count; i++) {
-      itemContainer.appendChild(createItem(currentCount + i));
-    }
-  }
-  addItems();
-
-  // Event listener for infinite scrolling
-  function handleScroll() {
-    const { scrollTop, scrollHeight, clientHeight } = itemContainer;
-    if (scrollTop + clientHeight >= scrollHeight - 10) {
-      addItems(10); // Load 10 more items when reaching the bottom
-    }
-  }
-
-  // Initialize the list with initial items and set up scroll listener
-  itemContainer.addEventListener("scroll", handleScroll);
-});
-
-// Folder creation function
-onAuthStateChanged(auth, (user) => {
-  const createFolder = document.getElementById("createBtn");
-  if (user) {
-    createFolder.onclick = async function () {
-      let folderName = document.getElementById("newFolderInput").value;
-
-      // Use a unique folder name based on the user input
-      if (folderName == "") {
-        folderName = "Untitled folder"; // Default name if input is empty
-      }
-      folderName = await getUniqueFolderName(folderName); // Get a unique name
-
-      await CreateFolder(folderName); // Pass the folderName to CreateFolder
-
-      async function CreateFolder(name) {
-        try {
-          const userRef = doc(db, "users", user.uid);
-          const foldersRef = collection(userRef, "folders");
-
-          const date = new Date();
-
-          // Use setDoc to add a new document to the folders collection
-          await addDoc(foldersRef, {
-            parent: "root",
-            folderName: folderName,
-            folderCreatedDate: `${(date.getMonth() + 1)
-              .toString()
-              .padStart(2, "0")}/${date
-              .getDate()
-              .toString()
-              .padStart(2, "0")}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
-            folderCreatedTime: `${date.getHours()}:${date
-              .getMinutes()
-              .toString()
-              .padStart(2, "0")}:${date
-              .getSeconds()
-              .toString()
-              .padStart(2, "0")}`, // Format as HH:MM:SS
-          });
-          location.reload();
-        } catch (error) {
-          console.error("Error adding folder: ", error.message);
-          console.error("Error adding folder: ", error);
-          alert("Failed to create folder.");
-        }
-      }
-    };
-  }
-});
-
-// Function to get a unique folder name based on user input
-async function getUniqueFolderName(baseName) {
-  const userRef = doc(db, "users", auth.currentUser.uid);
-  const foldersRef = collection(userRef, "folders");
-
-  const querySnapshot = await getDocs(foldersRef);
-  const existingNames = querySnapshot.docs.map((doc) => doc.id);
-
-  let uniqueName = baseName;
-  let counter = 1;
-
-  // Check for existing folder names and create a unique name
-  while (existingNames.includes(uniqueName)) {
-    uniqueName = `${baseName} (${counter})`;
-    counter++;
-  }
-
-  return uniqueName;
-}
-
-// Folder fetch and create function
+// Folder fetch on root
 document.addEventListener("DOMContentLoaded", () => {
   const itemContainer = document.getElementById("folderContainer");
 
@@ -375,7 +260,296 @@ document.addEventListener("DOMContentLoaded", () => {
   itemContainer.addEventListener("scroll", handleScroll);
 });
 
-// Function to handle click events (this gets the id of an element clicked.)
+// Quiz fetch on root
+document.addEventListener("DOMContentLoaded", () => {
+  const itemContainer = document.getElementById("itemContainer");
+
+  // Function to create a single item element
+  function createItem(folderId, quizName) {
+    const item = document.createElement("div");
+
+    item.classList.add("item"); // for css
+
+    // Quiz image element
+    const img = document.createElement("img");
+    img.src = "../../images/item.png";
+    img.alt = `${folderId}`;
+    img.classList.add("item-image-ff"); // for css
+
+    // Text element
+    const text = document.createElement("span");
+    text.textContent = `${quizName}`;
+    text.classList.add("item-text-ff");
+
+    item.appendChild(img);
+    item.appendChild(text);
+
+    return item;
+  }
+
+  // Fetch folders in Firestore
+  const getRootQuiz = async () => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const root = collection(userRef, "quizzes");
+
+          const quizNameSnapshot = await getDocs(root);
+
+          const quizNameList = [];
+
+          quizNameSnapshot.forEach((doc) => {
+            // Push the folder data to the array
+            quizNameList.push({ id: doc.id, ...doc.data() });
+          });
+
+          quizNameList.forEach((item) => {
+            const { id, quizName } = item;
+            itemContainer.appendChild(createItem(id, quizName));
+          });
+
+          return quizNameList;
+        } catch (error) {
+          console.error("Error retrieving folders: ", error.message);
+        }
+      }
+    });
+  };
+
+  getRootQuiz();
+
+  // Event listener for infinite scrolling
+  function handleScroll() {
+    const { scrollTop, scrollHeight, clientHeight } = itemContainer;
+    if (scrollTop + clientHeight >= scrollHeight - 10) {
+      addItems(10); // Load 10 more items when reaching the bottom
+    }
+  }
+
+  // Initialize the list with initial items and set up scroll listener
+  itemContainer.addEventListener("scroll", handleScroll);
+});
+
+// folder creation on firestore
+onAuthStateChanged(auth, (user) => {
+  const createFolder = document.getElementById("createBtn");
+  if (user) {
+    createFolder.onclick = async function () {
+      let folderName = document.getElementById("newFolderInput").value;
+
+      // Use a unique folder name based on the user input
+      if (folderName == "") {
+        folderName = "Untitled folder"; // Default name if input is empty
+      }
+      folderName = await getUniqueFolderName(folderName); // Get a unique name
+
+      await CreateFolder(folderName); // Pass the folderName to CreateFolder
+
+      async function CreateFolder(name) {
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const foldersRef = collection(userRef, "folders");
+
+          const date = new Date();
+
+          // Use setDoc to add a new document to the folders collection
+          await addDoc(foldersRef, {
+            parent: "root",
+            folderName: folderName,
+            folderCreatedDate: `${(date.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}/${date
+              .getDate()
+              .toString()
+              .padStart(2, "0")}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
+            folderCreatedTime: `${date.getHours()}:${date
+              .getMinutes()
+              .toString()
+              .padStart(2, "0")}:${date
+              .getSeconds()
+              .toString()
+              .padStart(2, "0")}`, // Format as HH:MM:SS
+          });
+          location.reload();
+        } catch (error) {
+          console.error("Error adding folder: ", error.message);
+          console.error("Error adding folder: ", error);
+          alert("Failed to create folder.");
+        }
+      }
+    };
+  }
+});
+
+// create dummy quiz item creation on firestore
+document.getElementById("dummyBtn").onclick = async () => {
+  if (currentLocation == "Root") {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const quizzesRef = collection(userRef, "quizzes");
+
+          const date = new Date();
+
+          await addDoc(quizzesRef, {
+            quizName: "quiz item dummy",
+            quizCreatedDate: `${(date.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}/${date
+              .getDate()
+              .toString()
+              .padStart(2, "0")}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
+            quizCreatedTime: `${date.getHours()}:${date
+              .getMinutes()
+              .toString()
+              .padStart(2, "0")}:${date
+              .getSeconds()
+              .toString()
+              .padStart(2, "0")}`, // Format as HH:MM:SS
+          });
+          location.reload();
+        } catch (error) {
+          console.error("Error adding quiz: ", error.message);
+          console.error("Error adding quiz: ", error);
+          alert("Failed to create quiz.");
+        }
+      }
+    });
+  } else {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const quizzesRef = collection(userDocRef, "folders");
+          const folderRef = doc(quizzesRef, currentLocationOnId);
+          const folderQuizzesRef = collection(folderRef, "quizzes");
+
+          const date = new Date();
+
+          await addDoc(folderQuizzesRef, {
+            quizName: "quiz item dummy",
+            quizCreatedDate: `${(date.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}/${date
+              .getDate()
+              .toString()
+              .padStart(2, "0")}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
+            quizCreatedTime: `${date.getHours()}:${date
+              .getMinutes()
+              .toString()
+              .padStart(2, "0")}:${date
+              .getSeconds()
+              .toString()
+              .padStart(2, "0")}`, // Format as HH:MM:SS
+          });
+          fetchQuizOnFolder();
+        } catch (error) {
+          console.error("Error adding quiz: ", error.message);
+          console.error("Error adding quiz: ", error);
+          alert("Failed to create quiz.");
+        }
+      }
+    });
+  }
+};
+
+// Function to get a unique folder name based on user input
+async function getUniqueFolderName(baseName) {
+  const userRef = doc(db, "users", auth.currentUser.uid);
+  const foldersRef = collection(userRef, "folders");
+
+  const querySnapshot = await getDocs(foldersRef);
+  const existingNames = querySnapshot.docs.map((doc) => doc.data().folderName); // Get folder names
+
+  let uniqueName = baseName;
+  let counter = 1;
+
+  // Check if the name exists, and append a counter if it does
+  while (existingNames.includes(uniqueName)) {
+    uniqueName = `${baseName} (${counter})`;
+    counter++;
+  }
+
+  return uniqueName;
+}
+
+// fetch quiz on folder function (used this function to fetch quizzes on current folder location)
+const fetchQuizOnFolder = async () => {
+  // Function to create a single item element
+  function createItem(index) {
+    const item = document.createElement("div");
+
+    item.classList.add("item"); // for css
+    item.id = `${index}`;
+
+    // Folder image element
+    const img = document.createElement("img");
+    img.src = "../../images/item.png";
+    img.alt = `${index}`;
+    img.classList.add("item-image-ff"); // for css
+
+    // Text element
+    const text = document.createElement("span");
+    text.textContent = `${index}`;
+    text.classList.add("item-text-ff");
+
+    item.appendChild(img);
+    item.appendChild(text);
+
+    return item;
+  }
+
+  // Fetch clicked folders
+  const getClickedFolders = async () => {
+    const folderContainer = document.getElementById("folderContainer");
+    const itemContainer = document.getElementById("itemContainer");
+    // Remove all folders from the previous folder
+    while (folderContainer.firstChild) {
+      folderContainer.removeChild(folderContainer.firstChild);
+    }
+    // Remove all quiz from the previous folder
+    while (itemContainer.firstChild) {
+      itemContainer.removeChild(itemContainer.firstChild);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const root = collection(userRef, "folders");
+          const folderDocRef = doc(root, currentLocationOnId);
+          const rootClickedFolder = collection(folderDocRef, "quizzes");
+
+          const quizNameSnapshot = await getDocs(rootClickedFolder);
+
+          const quizNameList = [];
+
+          quizNameSnapshot.forEach((doc) => {
+            // Push the folder data to the array
+            quizNameList.push({ id: doc.id, ...doc.data() });
+          });
+
+          const quizIdsArray = quizNameList.map((folder) => folder.id);
+          // Loop through each ID in the array and append it to folderContainer
+          quizIdsArray.forEach((folderId) => {
+            itemContainer.appendChild(createItem(folderId));
+          });
+
+          // You can also update the UI or perform other actions with the folderList
+          return quizNameList; // Return or process the folderList as needed
+        } catch (error) {
+          console.error("Error retrieving item: ", error.message);
+        }
+      }
+    });
+  };
+
+  getClickedFolders();
+};
+
+// Function to handle click events
 function handleClick(event) {
   const elementId = event.target.id;
   const folderName = event.target.textContent;
@@ -383,82 +557,9 @@ function handleClick(event) {
   if (elementId == "folderContainer") {
     // do nothing
   } else {
-    const folderContainer = document.getElementById("folderContainer");
-
-    // Function to create a single item element
-    function createItem(index) {
-      const folder = document.createElement("div");
-
-      folder.classList.add("folder"); // for css
-      folder.id = `${index}`;
-
-      // Folder image element
-      const img = document.createElement("img");
-      img.src = "../../images/folder.png";
-      img.alt = `${index}`;
-      img.classList.add("folder-image-ff"); // for css
-
-      // Text element
-      const text = document.createElement("span");
-      text.textContent = `${index}`;
-      text.classList.add("folder-text-ff");
-
-      // Removes all previous folders
-      while (folder.firstChild) {
-        folder.removeChild(folder.firstChild);
-      }
-
-      folder.appendChild(img);
-      folder.appendChild(text);
-
-      return folder;
-    }
-
-    // Fetch clicked folders
-    const getClickedFolders = async () => {
-      // Remove all folders from the previous folder
-      while (folderContainer.firstChild) {
-        folderContainer.removeChild(folderContainer.firstChild);
-      }
-
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          try {
-            const userRef = doc(db, "users", user.uid);
-            const root = collection(userRef, "folders");
-            const folderDocRef = doc(root, elementId); // Ensure this is a document
-            const rootClickedFolder = collection(folderDocRef, "folders"); // Reference to sub-collection under that specific folder document
-
-            // Query only documents with fileType: "folder"
-            const queryFolders = query(
-              rootClickedFolder,
-              where("fileType", "==", "folder")
-            );
-            const folderNameSnapshot = await getDocs(queryFolders);
-
-            const folderNameList = [];
-
-            folderNameSnapshot.forEach((doc) => {
-              // Push the folder data to the array
-              folderNameList.push({ id: doc.id, ...doc.data() });
-            });
-
-            const folderIdsArray = folderNameList.map((folder) => folder.id);
-            // Loop through each ID in the array and append it to folderContainer
-            folderIdsArray.forEach((folderId) => {
-              folderContainer.appendChild(createItem(folderId));
-            });
-
-            // You can also update the UI or perform other actions with the folderList
-            return folderNameList; // Return or process the folderList as needed
-          } catch (error) {
-            console.error("Error retrieving folders: ", error.message);
-          }
-        }
-      });
-    };
-
-    getClickedFolders();
+    currentLocation = folderName;
+    currentLocationOnId = elementId;
+    fetchQuizOnFolder();
 
     // create greater than sign
     const newH2 = document.createElement("h2");
@@ -470,8 +571,6 @@ function handleClick(event) {
     const dirFolderName = document.getElementById("dirFolderName");
     dirFolderName.textContent = folderName;
     dirFolderName.parentNode.insertBefore(newH2, dirFolderName);
-
-    console.log(`Clicked element ID: ${elementId}`);
   }
 }
 
