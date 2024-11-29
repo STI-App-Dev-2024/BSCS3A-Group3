@@ -138,6 +138,17 @@ h2 {
     color: #333;
 }
 
+#root {
+    cursor: pointer;
+}
+
+#root:hover {
+    color: #4caf50;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+
 /* layer1 will fill all space available horizontally*/
 .layer1 {
     display: flex;
