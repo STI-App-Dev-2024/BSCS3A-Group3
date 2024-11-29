@@ -152,14 +152,13 @@ h2 {
 /* layer1 will fill all space available horizontally*/
 .layer1 {
     display: flex;
-    justify-content: space-between;
     width: 100%;
     align-items: center;
 }
 
 .new-folder {
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Vertically center the items */
+    display: flex;
+    align-items: center;
     margin-left: auto; /* This pushes "New Folder" to the right */
     margin-right: 5px;
     cursor: pointer;
@@ -252,11 +251,38 @@ h2 {
     margin-top: 4px;
 }
 
+/* image in the folder container */
+.settings-image-ff {
+    width: 1.6%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+
+.share-image-ff {
+    width: 1.5%;
+    height: 100%;
+    margin-right: 24px;
+}
+
+.arrow-image-ff {
+    width: .9%;
+    height: 100%;
+    margin-left: 10px;
+    margin-right: 8px;
+}
+
+.start-image-ff {
+    width: 1.2%;
+    height: 100%;
+    margin-right: 8px;
+}
 
 /* Create quiz button */
 #openCreateQuizBtn {
     position: fixed;
-    bottom: 80px;
+    bottom: 70px;
     right: 100px;
     background-color: #4caf50;
     color: white;
@@ -520,5 +546,6 @@ h2 {
 }
 
 .profile-drawer a:hover {
-    background-color: #f0f0f0;
+    background-color: #4caf50;
+    color: #fff;
 }

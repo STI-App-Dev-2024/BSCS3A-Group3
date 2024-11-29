@@ -143,8 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     var cancelBtn = cancelBtnId ? document.getElementById(cancelBtnId) : null;
 
     function openModal() {
-      // Ensure the modal is initially set to display none
-      modal.style.display = "flex"; // Show modal for animation
+      modal.style.display = "flex";
       setTimeout(() => {
         modal.classList.remove("hide");
         modal.classList.add("show");
@@ -158,8 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.classList.add("hide");
 
       setTimeout(() => {
-        modal.style.display = "none"; // Hide modal after transition
-      }, 300); // Match with CSS transition duration
+        modal.style.display = "none";
+      }, 300);
     }
 
     // Open the modal when the button is clicked
@@ -199,18 +198,127 @@ document.addEventListener("DOMContentLoaded", () => {
     folder.id = `${folderId}`;
 
     // Folder image element
-    const img = document.createElement("img");
-    img.src = "../../images/folder.png";
-    img.alt = `${folderId}`;
-    img.classList.add("folder-image-ff"); // for css
+    const folderImg = document.createElement("img");
+    folderImg.src = "../../images/folder.png";
+    folderImg.classList.add("folder-image-ff"); // for css
+    folderImg.style.pointerEvents = "none";
 
     // Text element
     const text = document.createElement("span");
     text.textContent = `${folderName}`;
     text.classList.add("folder-text-ff");
+    text.style.pointerEvents = "none";
 
-    folder.appendChild(img);
+    // Settings image element
+    const settingsImg = document.createElement("img");
+    settingsImg.src = "../../images/settings.png";
+    settingsImg.classList.add("settings-image-ff"); // for css
+    settingsImg.id = "settingsFolder";
+
+    // Settings clicked
+    let windowDiv = null; // Variable to hold the created window
+    settingsImg.addEventListener("click", function (event) {
+      console.log("Settings image clicked");
+
+      // Check if the window already exists
+      if (windowDiv) {
+        // If the window exists, hide it
+        windowDiv.style.display = "none";
+        windowDiv = null; // Reset the windowDiv to null to track the state
+        return; // Exit the function if the window is being hidden
+      }
+
+      // Create the window
+      const createWindow = () => {
+        // Create the window div
+        windowDiv = document.createElement("div");
+        windowDiv.style.width = "150px";
+        windowDiv.style.border = "1px solid #ccc";
+        windowDiv.style.borderRadius = "8px";
+        windowDiv.style.backgroundColor = "#f9f9f9";
+        windowDiv.style.boxShadow = "0px 4px 8px rgba(0, 0, 0, 0.1)";
+        windowDiv.style.overflow = "hidden";
+
+        // Create the window body
+        const bodyDiv = document.createElement("div");
+        bodyDiv.style.padding = "10px";
+        bodyDiv.style.textAlign = "center";
+
+        // Create the buttons for choices
+        const choices = ["Cut", "Copy", "Delete", "Rename"];
+        choices.forEach((choice) => {
+          const button = document.createElement("button");
+          button.innerHTML = choice;
+          button.style.width = "100%";
+          button.style.padding = "10px";
+          button.style.margin = "5px 0";
+          button.style.color = "black";
+          button.style.backgroundColor = "#f9f9f9";
+          button.style.border = "none";
+          button.style.borderRadius = "4px";
+          button.style.cursor = "pointer";
+
+          // Button hover effect
+          button.addEventListener("mouseenter", () => {
+            button.style.backgroundColor = "#4caf50";
+            button.style.color = "white";
+          });
+          button.addEventListener("mouseleave", () => {
+            button.style.backgroundColor = "#f9f9f9";
+            button.style.color = "black";
+          });
+
+          // Button click event to show alert
+          button.addEventListener("click", () => {
+            alert(`You chose: ${choice}`);
+          });
+
+          bodyDiv.appendChild(button);
+        });
+
+        windowDiv.appendChild(bodyDiv);
+
+        // Add the window to the document body
+        document.body.appendChild(windowDiv);
+
+        // Add event listener to close the window when clicking outside
+        document.addEventListener("click", function closeWindow(event) {
+          if (
+            !windowDiv.contains(event.target) &&
+            event.target !== settingsImg
+          ) {
+            windowDiv.style.display = "none";
+            windowDiv = null; // Reset the windowDiv to null after closing
+            document.removeEventListener("click", closeWindow); // Remove the event listener after closing
+          }
+        });
+
+        // Update the window position based on mouse movement
+        document.addEventListener("click", function (event) {
+          const mouseX = event.clientX;
+          const mouseY = event.clientY;
+          const windowWidth = windowDiv.offsetWidth;
+          windowDiv.style.position = "absolute";
+          windowDiv.style.top = `${mouseY}px`;
+          windowDiv.style.left = `${mouseX - windowWidth}px`; // Position it to the left of the cursor
+          windowDiv.style.zIndex = "1000";
+        });
+      };
+
+      // Call the function to create the window
+      createWindow();
+    });
+
+    // Arrow image element
+    const arrowImg = document.createElement("img");
+    arrowImg.src = "../../images/right_arrow.png";
+    arrowImg.classList.add("arrow-image-ff"); // for css
+    arrowImg.style.pointerEvents = "none";
+
+    folder.appendChild(folderImg);
     folder.appendChild(text);
+    folder.appendChild(settingsImg);
+    folder.appendChild(arrowImg);
 
     return folder;
   }
@@ -281,8 +389,120 @@ document.addEventListener("DOMContentLoaded", () => {
     text.textContent = `${quizName}`;
     text.classList.add("item-text-ff");
 
+    // Settings image element
+    const settingsImg = document.createElement("img");
+    settingsImg.src = "../../images/settings.png";
+    settingsImg.classList.add("settings-image-ff"); // for css
+
+    // Settings clicked
+    let windowDiv = null; // Variable to hold the created window
+    settingsImg.addEventListener("click", function (event) {
+      console.log("Settings image clicked");
+
+      // Check if the window already exists
+      if (windowDiv) {
+        // If the window exists, hide it
+        windowDiv.style.display = "none";
+        windowDiv = null; // Reset the windowDiv to null to track the state
+        return; // Exit the function if the window is being hidden
+      }
+
+      // Create the window
+      const createWindow = () => {
+        // Create the window div
+        windowDiv = document.createElement("div");
+        windowDiv.style.width = "150px";
+        windowDiv.style.border = "1px solid #ccc";
+        windowDiv.style.borderRadius = "8px";
+        windowDiv.style.backgroundColor = "#f9f9f9";
+        windowDiv.style.boxShadow = "0px 4px 8px rgba(0, 0, 0, 0.1)";
+        windowDiv.style.overflow = "hidden";
+
+        // Create the window body
+        const bodyDiv = document.createElement("div");
+        bodyDiv.style.padding = "10px";
+        bodyDiv.style.textAlign = "center";
+
+        // Create the buttons for choices
+        const choices = ["Cut", "Copy", "Delete", "Rename"];
+        choices.forEach((choice) => {
+          const button = document.createElement("button");
+          button.innerHTML = choice;
+          button.style.width = "100%";
+          button.style.padding = "10px";
+          button.style.margin = "5px 0";
+          button.style.color = "black";
+          button.style.backgroundColor = "#f9f9f9";
+          button.style.border = "none";
+          button.style.borderRadius = "4px";
+          button.style.cursor = "pointer";
+
+          // Button hover effect
+          button.addEventListener("mouseenter", () => {
+            button.style.backgroundColor = "#4caf50";
+            button.style.color = "white";
+          });
+          button.addEventListener("mouseleave", () => {
+            button.style.backgroundColor = "#f9f9f9";
+            button.style.color = "black";
+          });
+
+          // Button click event to show alert
+          button.addEventListener("click", () => {
+            alert(`You chose: ${choice}`);
+          });
+
+          bodyDiv.appendChild(button);
+        });
+
+        windowDiv.appendChild(bodyDiv);
+
+        // Add the window to the document body
+        document.body.appendChild(windowDiv);
+
+        // Add event listener to close the window when clicking outside
+        document.addEventListener("click", function closeWindow(event) {
+          if (
+            !windowDiv.contains(event.target) &&
+            event.target !== settingsImg
+          ) {
+            windowDiv.style.display = "none";
+            windowDiv = null; // Reset the windowDiv to null after closing
+            document.removeEventListener("click", closeWindow); // Remove the event listener after closing
+          }
+        });
+
+        // Update the window position based on mouse movement
+        document.addEventListener("click", function (event) {
+          const mouseX = event.clientX;
+          const mouseY = event.clientY;
+          const windowWidth = windowDiv.offsetWidth;
+          windowDiv.style.position = "absolute";
+          windowDiv.style.top = `${mouseY}px`;
+          windowDiv.style.left = `${mouseX - windowWidth}px`; // Position it to the left of the cursor
+          windowDiv.style.zIndex = "1000";
+        });
+      };
+
+      // Call the function to create the window
+      createWindow();
+    });
+
+    // Share image element
+    const shareImg = document.createElement("img");
+    shareImg.src = "../../images/share.png";
+    shareImg.classList.add("share-image-ff"); // for css
+
+    // Start image element
+    const startImg = document.createElement("img");
+    startImg.src = "../../images/start.png";
+    startImg.classList.add("start-image-ff"); // for css
+
     item.appendChild(img);
     item.appendChild(text);
+    item.appendChild(settingsImg);
+    item.appendChild(shareImg);
+    item.appendChild(startImg);
 
     return item;
   }
@@ -326,7 +546,6 @@ document.addEventListener("DOMContentLoaded", () => {
       addItems(10); // Load 10 more items when reaching the bottom
     }
   }
-
   // Initialize the list with initial items and set up scroll listener
   itemContainer.addEventListener("scroll", handleScroll);
 });
@@ -495,8 +714,26 @@ const fetchQuizOnFolder = async () => {
     text.textContent = `${quizName}`;
     text.classList.add("item-text-ff");
 
+    // Settings image element
+    const settingsImg = document.createElement("img");
+    settingsImg.src = "../../images/settings.png";
+    settingsImg.classList.add("settings-image-ff"); // for css
+
+    // Share image element
+    const shareImg = document.createElement("img");
+    shareImg.src = "../../images/share.png";
+    shareImg.classList.add("share-image-ff"); // for css
+
+    // Start image element
+    const startImg = document.createElement("img");
+    startImg.src = "../../images/start.png";
+    startImg.classList.add("start-image-ff"); // for css
+
     item.appendChild(img);
     item.appendChild(text);
+    item.appendChild(settingsImg);
+    item.appendChild(shareImg);
+    item.appendChild(startImg);
 
     return item;
   }
@@ -505,6 +742,10 @@ const fetchQuizOnFolder = async () => {
   const getClickedFolders = async () => {
     const folderContainer = document.getElementById("folderContainer");
     const itemContainer = document.getElementById("itemContainer");
+
+    // hides the new folder button
+    newFolderBtn.style.visibility = "hidden";
+
     // Remove all folders from the previous folder
     while (folderContainer.firstChild) {
       folderContainer.removeChild(folderContainer.firstChild);
@@ -551,7 +792,9 @@ function handleClick(event) {
   const elementId = event.target.id;
   const folderName = event.target.textContent;
 
-  if (elementId == "folderContainer") {
+  console.log(elementId);
+
+  if (elementId == "folderContainer" || elementId == "settingsFolder") {
     // do nothing
   } else {
     currentLocation = folderName;
