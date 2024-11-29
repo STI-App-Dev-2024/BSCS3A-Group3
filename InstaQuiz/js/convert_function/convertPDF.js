@@ -25,7 +25,6 @@ document.querySelector('.convert-btn').addEventListener('click', async () => {
 
         const data = await response.json();
 
-        
         if (!data.questions || !Array.isArray(data.questions)) {
             throw new Error('Invalid response format');
         }
@@ -38,31 +37,30 @@ document.querySelector('.convert-btn').addEventListener('click', async () => {
 });
 
 function displayQuestions(questions) {
-    const content = document.querySelector('.content');
+    const content = document.querySelector('.content'); // Ensure this selector matches the element where questions should appear
     content.innerHTML = '<h2>Quiz Questions</h2>';
+    console.log("Received Questions:", questions);  // Debugging line
 
     questions.forEach((question, index) => {
         const questionElement = document.createElement('div');
-        
-       
         questionElement.innerHTML = `<p>${index + 1}. ${question.question}</p>`;
 
-       
-        question.options.forEach(option => {
-            questionElement.innerHTML += `<label><input type="radio" name="question${index}" value="${option}"> ${option}</label><br>`;
+        question.options.forEach((option, optionIndex) => {
+            const optionLetter = String.fromCharCode(65 + optionIndex); // Convert 0,1,2,3 to A,B,C,D
+            questionElement.innerHTML += `
+                <label>
+                    <input type="radio" name="question${index}" value="${optionLetter}"> ${option}
+                </label><br>`;
         });
 
-       
         content.appendChild(questionElement);
     });
-    
-   
+
     const submitButton = document.createElement('button');
     submitButton.id = 'submitBtn';
     submitButton.textContent = 'Submit';
     content.appendChild(submitButton);
-    
-     
+
     submitButton.addEventListener('click', () => {
         calculateScores(questions);
     });
@@ -74,7 +72,7 @@ async function calculateScores(questions) {
     questions.forEach((question, index) => {
         const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
         if (selectedOption) {
-            scores[`question${index}`] = selectedOption.value;
+            scores[index] = selectedOption.value;  // Use numeric keys
         }
     });
 
@@ -84,8 +82,12 @@ async function calculateScores(questions) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ scores }),
+            body: JSON.stringify({ scores, questions }),  // Include questions in payload
         });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
 
         const result = await response.json();
         alert(`Your score: ${result.score}`);
