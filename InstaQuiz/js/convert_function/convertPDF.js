@@ -1,3 +1,78 @@
+// Import Modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  addDoc,
+  collection,
+  getDocs,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+// Firebase configuration
+import { firebaseConfig } from "../firebase.js";
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 document.querySelector('.convert-btn').addEventListener('click', async () => {
     const questionCount = document.getElementById('questionCount').value;
     const fileInput = document.getElementById('fileInput');
@@ -72,7 +147,7 @@ async function calculateScores(questions) {
     questions.forEach((question, index) => {
         const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
         if (selectedOption) {
-            scores[index] = selectedOption.value;  // Use numeric keys
+            scores[index] = selectedOption.value;
         }
     });
 
@@ -82,7 +157,7 @@ async function calculateScores(questions) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ scores, questions }),  // Include questions in payload
+            body: JSON.stringify({ scores, questions }),
         });
 
         if (!response.ok) {
@@ -91,6 +166,28 @@ async function calculateScores(questions) {
 
         const result = await response.json();
         alert(`Your score: ${result.score}`);
+
+        // Save quiz data in Firestore
+        const userId = localStorage.getItem('loggedInUserId');
+        if (!userId) {
+            alert('User not logged in!');
+            return;
+        }
+
+        const quizData = {
+            score: result.score,
+            questions: questions.map((q, index) => ({
+                question: q.question,
+                options: q.options,
+                correctAnswer: q.answer,
+                selectedAnswer: scores[index] || null,
+            })),
+            timestamp: new Date(),
+        };
+
+        const userQuizRef = doc(db, 'users', userId, 'quizzes', `quiz-${Date.now()}`);
+        await setDoc(userQuizRef, quizData);
+        alert('Quiz results saved successfully!');
     } catch (error) {
         console.error('Error submitting quiz:', error);
         alert('Error submitting quiz. Please try again.');
