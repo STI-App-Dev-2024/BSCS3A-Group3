@@ -1,4 +1,3 @@
-// Import Modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import {
   getAuth,
@@ -18,61 +17,15 @@ import {
   where,
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-// Firebase configuration
+ 
 import { firebaseConfig } from "../firebase.js";
 
-// Initialize Firebase
+ 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 document.querySelector('.convert-btn').addEventListener('click', async () => {
     const questionCount = document.getElementById('questionCount').value;
     const fileInput = document.getElementById('fileInput');
@@ -111,17 +64,18 @@ document.querySelector('.convert-btn').addEventListener('click', async () => {
     }
 });
 
+ 
 function displayQuestions(questions) {
-    const content = document.querySelector('.content'); // Ensure this selector matches the element where questions should appear
+    const content = document.querySelector('.content');  
     content.innerHTML = '<h2>Quiz Questions</h2>';
-    console.log("Received Questions:", questions);  // Debugging line
+    console.log("Received Questions:", questions);   
 
     questions.forEach((question, index) => {
         const questionElement = document.createElement('div');
         questionElement.innerHTML = `<p>${index + 1}. ${question.question}</p>`;
 
         question.options.forEach((option, optionIndex) => {
-            const optionLetter = String.fromCharCode(65 + optionIndex); // Convert 0,1,2,3 to A,B,C,D
+            const optionLetter = String.fromCharCode(65 + optionIndex);  
             questionElement.innerHTML += `
                 <label>
                     <input type="radio" name="question${index}" value="${optionLetter}"> ${option}
@@ -136,18 +90,167 @@ function displayQuestions(questions) {
     submitButton.textContent = 'Submit';
     content.appendChild(submitButton);
 
+    
+    const saveButton = document.createElement('button');
+    saveButton.id = 'saveBtn';
+    saveButton.textContent = 'Save';
+    content.appendChild(saveButton);
+
     submitButton.addEventListener('click', () => {
         calculateScores(questions);
     });
+
+    saveButton.addEventListener('click', async () => {
+        const folderName = prompt("Enter folder name to save quiz:");
+
+        if (folderName) {
+            await saveQuizToFolder(folderName, questions);
+        } else {
+            alert('No folder name entered. Quiz not saved.');
+        }
+    });
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+async function saveQuizToFolder(questions) {
+    const userId = localStorage.getItem('loggedInUserId');
+    if (!userId) {
+        alert('User not logged in!');
+        return;
+    }
+
+    
+    const folderList = await getFolders(userId);
+    const content = document.querySelector('.content');  
+    content.innerHTML = '<h2>Select a Folder to Save Quiz</h2>';
+
+    if (folderList.length === 0) {
+        const createFolder = confirm('No folders exist. Would you like to create a new folder?');
+        if (createFolder) {
+            const folderName = prompt('Enter a name for the new folder:');
+            if (folderName) {
+                await createNewFolder(userId, folderName, questions);
+            } else {
+                alert('Folder creation cancelled.');
+            }
+        } else {
+            alert('Quiz not saved.');
+        }
+    } else {
+        folderList.forEach((folderName) => {
+            const folderButton = document.createElement('button');
+            folderButton.textContent = folderName;
+            folderButton.addEventListener('click', async () => {
+                await saveQuizToExistingFolder(userId, folderName, questions);
+            });
+            content.appendChild(folderButton);
+        });
+
+       
+        const createNewFolderButton = document.createElement('button');
+        createNewFolderButton.textContent = 'Create New Folder';
+        createNewFolderButton.addEventListener('click', async () => {
+            const folderName = prompt('Enter a name for the new folder:');
+            if (folderName) {
+                await createNewFolder(userId, folderName, questions);
+            } else {
+                alert('Folder creation cancelled.');
+            }
+        });
+        content.appendChild(createNewFolderButton);
+    }
+}
+
+ 
+async function getFolders(userId) {
+    const foldersSnapshot = await getDocs(collection(db, 'users', userId, 'folders'));
+    const folderList = [];
+    foldersSnapshot.forEach((doc) => {
+        folderList.push(doc.id);   
+    });
+    return folderList;
+}
+
+ 
+async function saveQuizToExistingFolder(userId, folderName, questions) {
+    const folderRef = doc(db, 'users', userId, 'folders', folderName);
+    const folderDoc = await getDoc(folderRef);
+
+    if (!folderDoc.exists()) {
+        alert(`Folder "${folderName}" does not exist. Please create the folder first.`);
+        return;
+    }
+
+    const quizData = {
+        timestamp: new Date(),
+        score: 0,  
+        questions: questions.map((q, index) => ({
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.answer,
+        })),
+    };
+
+    const quizRef = doc(db, 'users', userId, 'folders', folderName, 'quizzes', `quiz-${Date.now()}`);
+    await setDoc(quizRef, quizData);
+    alert('Quiz saved successfully in the folder!');
+
+    
+    window.location.href = "http://127.0.0.1:5500/BSCS3A-InstaQuiz/InstaQuiz/html/sidebars/sd_quizzes.html";
+}
+ 
+async function createNewFolder(userId, folderName, questions) {
+    const folderRef = doc(db, 'users', userId, 'folders', folderName);
+    await setDoc(folderRef, { name: folderName, created: new Date() });
+    alert(`Folder "${folderName}" created successfully!`);
+
+    
+    await saveQuizToExistingFolder(userId, folderName, questions);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Function to calculate scores
 async function calculateScores(questions) {
     const scores = {};
+    let score = 0;
 
     questions.forEach((question, index) => {
         const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
         if (selectedOption) {
             scores[index] = selectedOption.value;
+            if (selectedOption.value === question.answer) {
+                score++;
+            }
         }
     });
 
@@ -167,27 +270,15 @@ async function calculateScores(questions) {
         const result = await response.json();
         alert(`Your score: ${result.score}`);
 
-        // Save quiz data in Firestore
+        // Save quiz results to Firestore
         const userId = localStorage.getItem('loggedInUserId');
         if (!userId) {
             alert('User not logged in!');
             return;
         }
 
-        const quizData = {
-            score: result.score,
-            questions: questions.map((q, index) => ({
-                question: q.question,
-                options: q.options,
-                correctAnswer: q.answer,
-                selectedAnswer: scores[index] || null,
-            })),
-            timestamp: new Date(),
-        };
+        await saveQuizToFolder(questions);
 
-        const userQuizRef = doc(db, 'users', userId, 'quizzes', `quiz-${Date.now()}`);
-        await setDoc(userQuizRef, quizData);
-        alert('Quiz results saved successfully!');
     } catch (error) {
         console.error('Error submitting quiz:', error);
         alert('Error submitting quiz. Please try again.');
