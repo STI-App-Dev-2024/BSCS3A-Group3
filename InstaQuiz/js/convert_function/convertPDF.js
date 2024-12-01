@@ -228,17 +228,6 @@ async function createNewFolder(userId, folderName, questions) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 // Function to calculate scores
 async function calculateScores(questions) {
     const scores = {};
