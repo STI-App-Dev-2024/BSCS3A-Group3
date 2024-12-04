@@ -44,9 +44,7 @@ document.querySelector(".convert-btn").addEventListener("click", async () => {
       body: formData,
     });
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
+    if (!response.ok) throw new Error("Network response was not ok");
 
     const data = await response.json();
 
@@ -60,6 +58,7 @@ document.querySelector(".convert-btn").addEventListener("click", async () => {
     alert("Error fetching questions. Please try again.");
   }
 });
+
 function displayQuestions(questions) {
   const content = document.querySelector(".content");
   content.innerHTML = `
@@ -106,86 +105,114 @@ function displayQuestions(questions) {
 
   content.appendChild(buttonContainer);
 
-  submitButton.addEventListener("click", () => {
-    calculateScores(questions);
-  });
+  submitButton.addEventListener("click", () => calculateScores(questions));
+  saveButton.addEventListener("click", () => promptAndSaveQuiz(questions));
+}
 
-  saveButton.addEventListener("click", async () => {
-    const quizName = prompt("Enter quiz name to save quiz:");
-
-    if (quizName) {
+async function promptAndSaveQuiz(questions) {
+  const quizName = prompt("Enter quiz name to save quiz:");
+  if (quizName) {
+    try {
       await saveQuiz(quizName, questions);
-    } else {
-      alert("No quiz name entered. Quiz not saved.");
+      alert("Quiz saved successfully in the folder!");
+    } catch (error) {
+      console.error("Error saving quiz:", error);
+      alert("Failed to save the quiz. Please try again.");
     }
-  });
+  } else {
+    alert("No quiz name entered. Quiz not saved.");
+  }
 }
 
 async function saveQuiz(quizName, questions) {
   const userId = localStorage.getItem("loggedInUserId");
+  if (!userId) {
+    alert("User not logged in!");
+    return;
+  }
 
   const quizData = {
     quizName: quizName,
     timestamp: new Date(),
     score: 0,
-    questions: questions.map((q, index) => ({
+    questions: questions.map((q) => ({
       question: q.question,
       options: q.options,
       correctAnswer: q.answer,
     })),
   };
 
-  const quizRef = doc(db, "users", userId, "quizzes", `quiz-${Date.now()}`);
-
-  await setDoc(quizRef, quizData);
-  alert("Quiz saved successfully in the folder!");
-
-  window.location.href = "sd_quizzes.html";
+  try {
+    const quizzesCollection = collection(db, "users", userId, "quizzes");
+    await addDoc(quizzesCollection, quizData);
+  } catch (error) {
+    console.error("Error writing quiz to Firestore:", error);
+    throw error;
+  }
 }
 
-// Function to calculate scores
 async function calculateScores(questions) {
-  const scores = {};
   let score = 0;
+  const scores = {};
 
+  // Calculate the score by comparing answers
   questions.forEach((question, index) => {
     const selectedOption = document.querySelector(
       `input[name="question${index}"]:checked`
     );
     if (selectedOption) {
       scores[index] = selectedOption.value;
-      if (selectedOption.value === question.answer) {
-        score++;
-      }
+      if (selectedOption.value === question.answer) score++;
     }
   });
 
+  // Display the score
+  alert(`Your score: ${score}`);
+
+  // Save the score to Firestore
   try {
-    const response = await fetch("http://127.0.0.1:5000/submit-quiz", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ scores, questions }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const result = await response.json();
-    alert(`Your score: ${result.score}`);
-
-    // Save quiz results to Firestore
     const userId = localStorage.getItem("loggedInUserId");
     if (!userId) {
       alert("User not logged in!");
       return;
     }
 
-    await saveQuizToFolder(questions);
+    const quizName = prompt("Enter quiz name to save your score:");
+    if (!quizName) {
+      alert("No quiz name entered. Score not saved.");
+      return;
+    }
+
+    // Retrieve or create the quiz document in Firestore
+    const quizzesCollection = collection(db, "users", userId, "quizzes");
+    const quizQuery = query(
+      quizzesCollection,
+      where("quizName", "==", quizName)
+    );
+    const existingQuizSnapshot = await getDocs(quizQuery);
+
+    if (!existingQuizSnapshot.empty) {
+      // If the quiz already exists, update the score
+      const quizDocRef = existingQuizSnapshot.docs[0].ref;
+      await updateDoc(quizDocRef, { score });
+      alert("Score updated successfully!");
+    } else {
+      // If the quiz doesn't exist, create a new quiz with the score
+      const quizData = {
+        quizName: quizName,
+        timestamp: new Date(),
+        score: score,
+        questions: questions.map((q) => ({
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.answer,
+        })),
+      };
+      await addDoc(quizzesCollection, quizData);
+      alert("Quiz and score saved successfully!");
+    }
   } catch (error) {
-    console.error("Error submitting quiz:", error);
-    alert("Error submitting quiz. Please try again.");
+    console.error("Error saving score:", error);
+    alert("Error saving score. Please try again.");
   }
 }
