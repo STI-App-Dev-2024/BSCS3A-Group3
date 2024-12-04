@@ -29,6 +29,9 @@ const db = getFirestore(app);
 let currentLocation = ["Root"];
 let currentLocationOnId = [];
 
+FetchRootFolders();
+FetchRootQuizzes();
+
 // Drag and Drop functionality
 document.addEventListener("DOMContentLoaded", () => {
   document
@@ -187,8 +190,36 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModal("myCreateQuizModal", "openCreateQuizBtn");
 });
 
-// Folder fetch on root and quiz settings
+// Root btn
 document.addEventListener("DOMContentLoaded", () => {
+  const rootBtn = document.getElementById("root");
+  rootBtn.onclick = async function () {
+    currentLocation = "Root";
+    currentLocationOnId = [];
+
+    // removes the quiz on previous folder
+    const folderContainer = document.getElementById("folderContainer");
+    const itemContainer = document.getElementById("itemContainer");
+
+    // hides the new folder button
+    newFolderBtn.style.visibility = "hidden";
+
+    // Remove all folders from the previous folder
+    while (folderContainer.firstChild) {
+      folderContainer.removeChild(folderContainer.firstChild);
+    }
+    // Remove all quiz from the previous folder
+    while (itemContainer.firstChild) {
+      itemContainer.removeChild(itemContainer.firstChild);
+    }
+
+    FetchRootFolders();
+    FetchRootQuizzes();
+  };
+});
+
+// Folder fetch on root and quiz settings
+function FetchRootFolders() {
   const itemContainer = document.getElementById("folderContainer");
 
   // Function to create a single item element
@@ -461,10 +492,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize the list with initial items and set up scroll listener
   itemContainer.addEventListener("scroll", handleScroll);
-});
+}
 
 // Quiz fetch on root and quiz settings
-document.addEventListener("DOMContentLoaded", () => {
+function FetchRootQuizzes() {
   const itemContainer = document.getElementById("itemContainer");
 
   // Function to create a single item element
@@ -583,7 +614,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 cancelBtn.onclick = closeModal;
               }
 
-              CopyQuiz(quizId);
+              CopyQuiz(quizId, quizName);
             }
 
             if (choice == "Delete") {
@@ -765,7 +796,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   // Initialize the list with initial items and set up scroll listener
   itemContainer.addEventListener("scroll", handleScroll);
-});
+}
 
 // folder creation on firestore
 onAuthStateChanged(auth, (user) => {
@@ -817,40 +848,75 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // quiz copy on firestore
-async function CopyQuiz(quizId) {
+async function CopyQuiz(quizId, quizName) {
   const pasteBtn = document.getElementById("copyQuizBtn");
 
   pasteBtn.onclick = async function () {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
+          // copied quiz ref
           const userDoc = doc(db, "users", user.uid);
-          const quizRef = collection(userDoc, "quizzes");
-          const folderRef = doc(quizRef, quizId);
-          const docSnap = await getDoc(folderRef);
+          const quizzesRef = collection(userDoc, "quizzes");
+          const quizRef = doc(quizzesRef, quizId);
+          const docSnap = await getDoc(quizRef);
 
-          if (docSnap.exists()) {
-            const docData = docSnap.data();
+          if (currentLocationOnId == "") {
+            if (docSnap.exists()) {
+              const docData = docSnap.data();
 
+              var uniqueName = await getUniqueQuizName(quizName); // Get a unique name
+
+              // Add the UniqueName to the document data
+              docData.quizName = uniqueName;
+
+              await addDoc(quizzesRef, docData);
+              location.reload();
+            } else {
+              console.log("No such document!");
+            }
+          } else {
+            // target folder ref
             const foldersRef = collection(userDoc, "folders");
             const targetFolderRef = doc(foldersRef, currentLocationOnId);
-            const targetQuizRef = doc(collection(targetFolderRef, "quizzes"));
+            const targetQuizRef = collection(targetFolderRef, "quizzes");
 
-            await setDoc(targetQuizRef, docData);
+            if (docSnap.exists()) {
+              const docData = docSnap.data();
 
-            var modal = document.getElementById("myCopyQuizModal");
-            modal.style.opacity = "0";
-            modal.classList.remove("show");
-            modal.classList.add("hide");
+              // checks the uniqueness of the quiz name
+              const querySnapshot = await getDocs(targetQuizRef);
+              const existingNames = new Set(
+                querySnapshot.docs.map((doc) => doc.data().quizName)
+              );
 
-            setTimeout(() => {
-              modal.style.display = "none";
-            }, 300);
+              let uniqueName = quizName;
+              let counter = 1;
 
-            fetchQuizOnFolder();
-          } else {
-            console.log("No such document!");
+              while (existingNames.has(uniqueName)) {
+                uniqueName = `${quizName} (${counter++})`;
+              }
+
+              var UniqueName = uniqueName;
+
+              // Add the UniqueName to the document data
+              docData.quizName = UniqueName;
+
+              await addDoc(targetQuizRef, docData);
+              fetchQuizOnFolder();
+            } else {
+              console.log("No such document!");
+            }
           }
+
+          var modal = document.getElementById("myCopyQuizModal");
+          modal.style.opacity = "0";
+          modal.classList.remove("show");
+          modal.classList.add("hide");
+
+          setTimeout(() => {
+            modal.style.display = "none";
+          }, 300);
         } catch (error) {
           console.error("Error copying document: ", error);
         }
@@ -897,6 +963,7 @@ function RenameFolder(folderId) {
     }
   });
 }
+
 // quiz rename on firestore
 function RenameQuiz(quizId) {
   onAuthStateChanged(auth, (user) => {
