@@ -54,7 +54,7 @@ onAuthStateChanged(auth, async (user) => {
       // Display the user's name on the homepage
       document.querySelector(
         ".user-name"
-      ).textContent = `${capitalizedFirstName} ${capitalizedMiddleName} ${capitalizedLastName}`;
+      ).textContent = `${capitalizedFirstName} ${capitalizedLastName}`;
     } else {
       console.error("No such document in Firestore!");
     }
