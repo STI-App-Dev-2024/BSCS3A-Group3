@@ -148,12 +148,12 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         modal.classList.remove("hide");
         modal.classList.add("show");
-        modal.style.opacity = "1"; // Start fade-in
-      }, 0); // Timeout to allow display to take effect
+        modal.style.opacity = "1";
+      }, 0);
     }
 
     function closeModal() {
-      modal.style.opacity = "0"; // Start fade-out
+      modal.style.opacity = "0";
       modal.classList.remove("show");
       modal.classList.add("hide");
 
@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModal("myCreateQuizModal", "openCreateQuizBtn");
 });
 
-// Folder fetch on root
+// Folder fetch on root and quiz settings
 document.addEventListener("DOMContentLoaded", () => {
   const itemContainer = document.getElementById("folderContainer");
 
@@ -217,19 +217,22 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsImg.id = "settingsFolder";
 
     // Settings clicked
-    let windowDiv = null; // Variable to hold the created window
+    let windowDiv = null;
     settingsImg.addEventListener("click", function (event) {
       // Check if the window already exists
       if (windowDiv) {
-        // If the window exists, hide it
-        windowDiv.style.display = "none";
-        windowDiv = null; // Reset the windowDiv to null to track the state
-        return; // Exit the function if the window is being hidden
+        // If the window exists, hide it with fade out animation
+        windowDiv.style.opacity = "0";
+        windowDiv.style.transform = "scale(0.9)";
+        setTimeout(() => {
+          windowDiv.remove();
+          windowDiv = null;
+        }, 300);
+        return;
       }
 
       // Create the window
       const createWindow = () => {
-        // Create the window div
         windowDiv = document.createElement("div");
         windowDiv.style.width = "150px";
         windowDiv.style.border = "1px solid #ccc";
@@ -237,6 +240,11 @@ document.addEventListener("DOMContentLoaded", () => {
         windowDiv.style.backgroundColor = "#f9f9f9";
         windowDiv.style.boxShadow = "0px 4px 8px rgba(0, 0, 0, 0.1)";
         windowDiv.style.overflow = "hidden";
+
+        // Fade in animation
+        windowDiv.style.opacity = "0";
+        windowDiv.style.transform = "scale(0.9)";
+        windowDiv.style.transition = "opacity 0.3s ease, transform 0.3s ease";
 
         // Create the window body
         const bodyDiv = document.createElement("div");
@@ -301,8 +309,47 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (choice == "Rename") {
-              alert("you chose rename");
+              var modal = document.getElementById("myRenameFolderModal");
+              var cancelBtn = "renameCancelBtn"
+                ? document.getElementById("renameCancelBtn")
+                : null;
+
+              modal.style.display = "flex";
+              setTimeout(() => {
+                modal.classList.remove("hide");
+                modal.classList.add("show");
+                modal.style.opacity = "1";
+              }, 0);
+
+              function closeModal() {
+                modal.style.opacity = "0";
+                modal.classList.remove("show");
+                modal.classList.add("hide");
+
+                setTimeout(() => {
+                  modal.style.display = "none";
+                }, 300);
+              }
+
+              // Closes the modal when the cancel button is clicked
+              if (cancelBtn) {
+                cancelBtn.onclick = closeModal;
+              }
+
+              // Close the modal when clicking anywhere outside of the modal content
+              window.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                  closeModal();
+                }
+              });
+
+              // Gets the current folder name
+              let renamedFolder = document.getElementById("renameFolderInput");
+              renamedFolder.value = folderName;
+
+              RenameFolder(folderId);
             }
+
             // hides window
             windowDiv.style.display = "none";
             windowDiv = null;
@@ -313,8 +360,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         windowDiv.appendChild(bodyDiv);
 
-        // Add the window to the document body
+        // Append the window
         document.body.appendChild(windowDiv);
+        requestAnimationFrame(() => {
+          windowDiv.style.opacity = "1";
+          windowDiv.style.transform = "scale(1)";
+        });
 
         // Add event listener to close the window when clicking outside
         document.addEventListener("click", function closeWindow(event) {
@@ -322,21 +373,30 @@ document.addEventListener("DOMContentLoaded", () => {
             !windowDiv.contains(event.target) &&
             event.target !== settingsImg
           ) {
-            windowDiv.style.display = "none";
-            windowDiv = null; // Reset the windowDiv to null after closing
-            document.removeEventListener("click", closeWindow); // Remove the event listener after closing
+            windowDiv.style.opacity = "0";
+            windowDiv.style.transform = "scale(0.9)";
+            setTimeout(() => {
+              windowDiv.remove();
+              windowDiv = null; // Reset the windowDiv to null to track the state
+            }, 300);
+            document.removeEventListener("click", closeWindow);
           }
         });
 
         // Update the window position based on mouse movement
         document.addEventListener("click", function (event) {
-          const mouseX = event.clientX;
-          const mouseY = event.clientY;
-          const windowWidth = windowDiv.offsetWidth;
-          windowDiv.style.position = "absolute";
-          windowDiv.style.top = `${mouseY}px`;
-          windowDiv.style.left = `${mouseX - windowWidth}px`; // Position it to the left of the cursor
-          windowDiv.style.zIndex = "1000";
+          if (
+            windowDiv &&
+            (windowDiv.contains(event.target) || event.target === settingsImg)
+          ) {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            const windowWidth = windowDiv.offsetWidth;
+            windowDiv.style.position = "absolute";
+            windowDiv.style.top = `${mouseY}px`;
+            windowDiv.style.left = `${mouseX - windowWidth}px`;
+            windowDiv.style.zIndex = "1000";
+          }
         });
       };
 
@@ -403,7 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
   itemContainer.addEventListener("scroll", handleScroll);
 });
 
-// Quiz fetch on root
+// Quiz fetch on root and quiz settings
 document.addEventListener("DOMContentLoaded", () => {
   const itemContainer = document.getElementById("itemContainer");
 
@@ -434,9 +494,13 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsImg.addEventListener("click", function (event) {
       // Check if the window already exists
       if (windowDiv) {
-        // If the window exists, hide it
-        windowDiv.style.display = "none";
-        windowDiv = null;
+        // If the window exists, hide it with fade out animation
+        windowDiv.style.opacity = "0";
+        windowDiv.style.transform = "scale(0.9)";
+        setTimeout(() => {
+          windowDiv.remove();
+          windowDiv = null;
+        }, 300);
         return;
       }
 
@@ -455,6 +519,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const bodyDiv = document.createElement("div");
         bodyDiv.style.padding = "10px";
         bodyDiv.style.textAlign = "center";
+
+        // Fade in animation
+        windowDiv.style.opacity = "0";
+        windowDiv.style.transform = "scale(0.9)";
+        windowDiv.style.transition = "opacity 0.3s ease, transform 0.3s ease";
 
         // Create the buttons for choices
         const choices = ["Cut", "Copy", "Delete", "Rename"];
@@ -514,7 +583,45 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (choice == "Rename") {
-              alert("you chose rename");
+              var modal = document.getElementById("myRenameQuizModal");
+              var cancelBtn = "renameQuizCancelBtn"
+                ? document.getElementById("renameQuizCancelBtn")
+                : null;
+
+              modal.style.display = "flex";
+              setTimeout(() => {
+                modal.classList.remove("hide");
+                modal.classList.add("show");
+                modal.style.opacity = "1";
+              }, 0);
+
+              function closeModal() {
+                modal.style.opacity = "0";
+                modal.classList.remove("show");
+                modal.classList.add("hide");
+
+                setTimeout(() => {
+                  modal.style.display = "none";
+                }, 300);
+              }
+
+              // Closes the modal when the cancel button is clicked
+              if (cancelBtn) {
+                cancelBtn.onclick = closeModal;
+              }
+
+              // Close the modal when clicking anywhere outside of the modal content
+              window.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                  closeModal();
+                }
+              });
+
+              // Gets the current quiz name
+              let renamedQuiz = document.getElementById("renameQuizInput");
+              renamedQuiz.value = quizName;
+
+              RenameQuiz(quizId);
             }
 
             // hides window
@@ -527,8 +634,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         windowDiv.appendChild(bodyDiv);
 
-        // Add the window to the document body
+        // Append the window
         document.body.appendChild(windowDiv);
+        requestAnimationFrame(() => {
+          windowDiv.style.opacity = "1";
+          windowDiv.style.transform = "scale(1)";
+        });
 
         // Add event listener to close the window when clicking outside
         document.addEventListener("click", function closeWindow(event) {
@@ -536,21 +647,30 @@ document.addEventListener("DOMContentLoaded", () => {
             !windowDiv.contains(event.target) &&
             event.target !== settingsImg
           ) {
-            windowDiv.style.display = "none";
-            windowDiv = null;
-            document.removeEventListener("click", closeWindow); // Remove the event listener after closing
+            windowDiv.style.opacity = "0";
+            windowDiv.style.transform = "scale(0.9)";
+            setTimeout(() => {
+              windowDiv.remove();
+              windowDiv = null; // Reset the windowDiv to null to track the state
+            }, 300);
+            document.removeEventListener("click", closeWindow);
           }
         });
 
         // Update the window position based on mouse movement
         document.addEventListener("click", function (event) {
-          const mouseX = event.clientX;
-          const mouseY = event.clientY;
-          const windowWidth = windowDiv.offsetWidth;
-          windowDiv.style.position = "absolute";
-          windowDiv.style.top = `${mouseY}px`;
-          windowDiv.style.left = `${mouseX - windowWidth}px`;
-          windowDiv.style.zIndex = "1000";
+          if (
+            windowDiv &&
+            (windowDiv.contains(event.target) || event.target === settingsImg)
+          ) {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            const windowWidth = windowDiv.offsetWidth;
+            windowDiv.style.position = "absolute";
+            windowDiv.style.top = `${mouseY}px`;
+            windowDiv.style.left = `${mouseX - windowWidth}px`;
+            windowDiv.style.zIndex = "1000";
+          }
         });
       };
 
@@ -643,7 +763,6 @@ onAuthStateChanged(auth, (user) => {
           const date = new Date();
 
           await addDoc(foldersRef, {
-            parent: "root",
             folderName: folderName,
             folderCreatedDate: `${(date.getMonth() + 1)
               .toString()
@@ -669,6 +788,86 @@ onAuthStateChanged(auth, (user) => {
     };
   }
 });
+// folder rename on firestore
+function RenameFolder(folderId) {
+  onAuthStateChanged(auth, (user) => {
+    const renameFolder = document.getElementById("renameBtn");
+    if (user) {
+      renameFolder.onclick = async function () {
+        let renamedFolder = document.getElementById("renameFolderInput").value;
+
+        // Use a unique folder name based on the user input
+        if (renamedFolder == "") {
+          renamedFolder = "Untitled folder"; // Default name if input is empty
+        }
+        renamedFolder = await getUniqueFolderName(renamedFolder); // Get a unique name
+
+        await CheckRenameFolder(renamedFolder);
+
+        async function CheckRenameFolder(name) {
+          try {
+            const userRef = doc(db, "users", user.uid);
+            const foldersRef = collection(userRef, "folders");
+            const folderRef = doc(foldersRef, folderId);
+
+            await setDoc(
+              folderRef,
+              { folderName: renamedFolder },
+              { merge: true }
+            );
+            location.reload();
+          } catch (error) {
+            console.error("Error renaming folder: ", error.message);
+            console.error("Error renaming folder: ", error);
+            alert("Failed to rename folder.");
+          }
+        }
+      };
+    }
+  });
+}
+// quiz rename on firestore
+function RenameQuiz(quizId) {
+  onAuthStateChanged(auth, (user) => {
+    const renamedQuiz = document.getElementById("renameQuizBtn");
+    if (user) {
+      renamedQuiz.onclick = async function () {
+        let renamedQuiz = document.getElementById("renameQuizInput").value;
+
+        // Use a unique folder name based on the user input
+        if (renamedQuiz == "") {
+          renamedQuiz = "Untitled quiz"; // Default name if input is empty
+        }
+        renamedQuiz = await getUniqueQuizName(renamedQuiz); // Get a unique name
+
+        await CheckRenameQuiz(renamedQuiz);
+
+        async function CheckRenameQuiz() {
+          onAuthStateChanged(auth, async (user) => {
+            if (user) {
+              try {
+                const userRef = doc(db, "users", user.uid);
+                const quizzesRef = collection(userRef, "quizzes");
+                const quizRef = doc(quizzesRef, quizId);
+
+                await setDoc(
+                  quizRef,
+                  { quizName: renamedQuiz },
+                  { merge: true }
+                );
+                location.reload();
+              } catch (error) {
+                console.error("Error renaming quiz: ", error.message);
+                console.error("Error renaming quiz: ", error);
+                alert("Failed to renaming quiz.");
+              }
+            }
+          });
+        }
+      };
+    }
+  });
+}
 
 // create dummy quiz item creation on firestore
 document.getElementById("dummyBtn").onclick = async () => {
@@ -750,6 +949,26 @@ async function getUniqueFolderName(baseName) {
 
   const querySnapshot = await getDocs(foldersRef);
   const existingNames = querySnapshot.docs.map((doc) => doc.data().folderName); // Get folder names
+
+  let uniqueName = baseName;
+  let counter = 1;
+
+  // Check if the name exists, and append a counter if it does
+  while (existingNames.includes(uniqueName)) {
+    uniqueName = `${baseName} (${counter})`;
+    counter++;
+  }
+
+  return uniqueName;
+}
+
+// Function to get a unique quiz name based on user input
+async function getUniqueQuizName(baseName) {
+  const userRef = doc(db, "users", auth.currentUser.uid);
+  const quizzesRef = collection(userRef, "quizzes");
+
+  const querySnapshot = await getDocs(quizzesRef);
+  const existingNames = querySnapshot.docs.map((doc) => doc.data().quizName); // Get quiz names
 
   let uniqueName = baseName;
   let counter = 1;
