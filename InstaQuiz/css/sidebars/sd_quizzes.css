@@ -511,6 +511,7 @@ h2 {
     flex-direction: column;
     justify-content: center;
     max-height: 100%;
+    height: 350px;
 }
 
 .convert-btn {
