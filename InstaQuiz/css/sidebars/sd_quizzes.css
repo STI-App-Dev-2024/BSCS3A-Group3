@@ -156,93 +156,9 @@ h2 {
     align-items: center;
 }
 
-.new-folder {
-    display: flex;
-    align-items: center;
-    margin-left: auto; /* This pushes "New Folder" to the right */
-    margin-right: 5px;
-    cursor: pointer;
-}
 
-#newfolderIcon {
-    margin-right: 5px; /* Add space between the icon and text */
-    margin-bottom: 5px;
-}
 
-/* New Folder Modal container, hidden by default */
-.newFolderModal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.3s ease;;
-    opacity: 0;
-}
 
-.newFolderModal.show {
-    display: flex;
-    opacity: 1;
-}
-
-.newFolderModal.hide {
-    opacity: 0;
-}
-
-/* Rename Folder Modal container, hidden by default */
-.renameFolderModal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.3s ease;;
-    opacity: 0;
-}
-
-.renameFolderModal.show {
-    display: flex;
-    opacity: 1;
-}
-
-.renameFolderModal.hide {
-    opacity: 0;
-}
-
-/* Rename Quiz Modal container, hidden by default */
-.renameQuizModal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.3s ease;;
-    opacity: 0;
-}
-
-.renameQuizModal.show {
-    display: flex;
-    opacity: 1;
-}
-
-.renameQuizModal.hide {
-    opacity: 0;
-}
 
 .ffcontainer {
     width: 100%;
@@ -397,7 +313,21 @@ h2 {
     display: block;
 }
 
-/* New Folder modal container, hidden by default */
+
+.new-folder {
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* This pushes "New Folder" to the right */
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+#newfolderIcon {
+    margin-right: 5px; /* Add space between the icon and text */
+    margin-bottom: 5px;
+}
+
+/* New Folder Modal container, hidden by default */
 .newFolderModal {
     display: none;
     position: fixed;
@@ -409,7 +339,8 @@ h2 {
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
-
+    transition: opacity 0.3s ease;;
+    opacity: 0;
 }
 
 /* New Folder modal content */
@@ -421,7 +352,7 @@ h2 {
     height: auto; 
     overflow-y: auto;
     border-radius: 8px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4); /* Soft shadow effect */
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* New Folder text title */
@@ -447,6 +378,15 @@ h2 {
 .create-folder-buttons {
     display: flex;
     justify-content: flex-end;
+}
+
+.newFolderModal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.newFolderModal.hide {
+    opacity: 0;
 }
 
 /* Cancel Button */
@@ -481,10 +421,7 @@ h2 {
 }
 
 
-
-
-
-/* Rename Folder modal container, hidden by default */
+/* Rename Folder Modal container, hidden by default */
 .renameFolderModal {
     display: none;
     position: fixed;
@@ -496,8 +433,10 @@ h2 {
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
-
+    transition: opacity 0.3s ease;;
+    opacity: 0;
 }
+
 
 /* Rename Folder modal content */
 .rename-folder-modal-content {
@@ -531,6 +470,11 @@ h2 {
     box-sizing: border-box;
 }
 
+.rename-folder-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
 /* Cancel Button */
 .rename-cancel-btn {
     padding: 12px 25px;
@@ -561,6 +505,14 @@ h2 {
     border: 2px solid #6bc06c;
 }
 
+.renameFolderModal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.renameFolderModal.hide {
+    opacity: 0;
+}
 
 /* Rename Quiz modal container, hidden by default */
 .renameQuizModal {
@@ -574,7 +526,8 @@ h2 {
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
-
+    transition: opacity 0.3s ease;;
+    opacity: 0;
 }
 
 /* Rename Quiz modal content */
@@ -586,7 +539,7 @@ h2 {
     height: auto; 
     overflow-y: auto;
     border-radius: 8px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4); /* Soft shadow effect */
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Rename Quiz text title */
@@ -607,6 +560,11 @@ h2 {
     margin-bottom: 45px;
     width: 100%;
     box-sizing: border-box;
+}
+
+.rename-quiz-buttons {
+    display: flex;
+    justify-content: flex-end;
 }
 
 /* Cancel Button */
@@ -638,6 +596,84 @@ h2 {
     background-color: #6bc06c;
     border: 2px solid #6bc06c;
 }
+
+/* Copy Quiz Modal */
+.copyQuizModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    overflow: auto;
+    transition: opacity 0.3s ease;;
+    opacity: 0;
+}
+
+.copy-quiz-modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: auto;
+    height: auto;
+    margin-bottom: 5%;
+    border-radius: 8px;
+    box-shadow: 0 0px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Copy Quiz Buttons container */
+.copy-quiz-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Copy Quiz Button */
+.copy-quiz-btn {
+    padding: 12px 15px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    margin-right: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.copy-quiz-btn:hover {
+    background-color: #45a049;
+}
+
+.copyQuizModal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.copyQuizModal.hide {
+    opacity: 0;
+}
+
+/* Cancel Button */
+.copy-quiz-cancel-btn {
+    padding: 12px 30px;
+    background-color: white;
+    color: #dd3a3a;
+    border: 2px solid #dd3a3a;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: left;
+    margin-left: 5px;
+    margin-right: 25px;
+}
+
+.copy-quiz-cancel-btn:hover {
+    background-color: #dd3a3a;
+    color: white;
+}
+
 
 
 /* Create Quiz modal container, hidden by default */

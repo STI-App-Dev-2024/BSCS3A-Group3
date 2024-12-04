@@ -556,7 +556,34 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (choice == "Copy") {
-              alert("you chose copy");
+              var modal = document.getElementById("myCopyQuizModal");
+              var cancelBtn = "copyQuizCancelBtn"
+                ? document.getElementById("copyQuizCancelBtn")
+                : null;
+
+              modal.style.display = "flex";
+              setTimeout(() => {
+                modal.classList.remove("hide");
+                modal.classList.add("show");
+                modal.style.opacity = "1";
+              }, 0);
+
+              function closeModal() {
+                modal.style.opacity = "0";
+                modal.classList.remove("show");
+                modal.classList.add("hide");
+
+                setTimeout(() => {
+                  modal.style.display = "none";
+                }, 300);
+              }
+
+              // Closes the modal when the cancel button is clicked
+              if (cancelBtn) {
+                cancelBtn.onclick = closeModal;
+              }
+
+              CopyQuiz(quizId);
             }
 
             if (choice == "Delete") {
@@ -788,6 +815,50 @@ onAuthStateChanged(auth, (user) => {
     };
   }
 });
+
+// quiz copy on firestore
+async function CopyQuiz(quizId) {
+  const pasteBtn = document.getElementById("copyQuizBtn");
+
+  pasteBtn.onclick = async function () {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDoc = doc(db, "users", user.uid);
+          const quizRef = collection(userDoc, "quizzes");
+          const folderRef = doc(quizRef, quizId);
+          const docSnap = await getDoc(folderRef);
+
+          if (docSnap.exists()) {
+            const docData = docSnap.data();
+
+            const foldersRef = collection(userDoc, "folders");
+            const targetFolderRef = doc(foldersRef, currentLocationOnId);
+            const targetQuizRef = doc(collection(targetFolderRef, "quizzes"));
+
+            await setDoc(targetQuizRef, docData);
+
+            var modal = document.getElementById("myCopyQuizModal");
+            modal.style.opacity = "0";
+            modal.classList.remove("show");
+            modal.classList.add("hide");
+
+            setTimeout(() => {
+              modal.style.display = "none";
+            }, 300);
+
+            fetchQuizOnFolder();
+          } else {
+            console.log("No such document!");
+          }
+        } catch (error) {
+          console.error("Error copying document: ", error);
+        }
+      }
+    });
+  };
+}
+
 // folder rename on firestore
 function RenameFolder(folderId) {
   onAuthStateChanged(auth, (user) => {
