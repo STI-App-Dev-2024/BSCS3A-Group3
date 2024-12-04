@@ -60,36 +60,51 @@ document.querySelector(".convert-btn").addEventListener("click", async () => {
     alert("Error fetching questions. Please try again.");
   }
 });
-
 function displayQuestions(questions) {
   const content = document.querySelector(".content");
-  content.innerHTML = "<h2>Quiz Questions</h2>";
-  console.log("Received Questions:", questions);
+  content.innerHTML = `
+    <h2 class="quiz-title">Quiz Questions</h2>
+    <div class="questions-container"></div>
+  `;
 
+  const questionsContainer = content.querySelector(".questions-container");
   questions.forEach((question, index) => {
     const questionElement = document.createElement("div");
-    questionElement.innerHTML = `<p>${index + 1}. ${question.question}</p>`;
-
-    question.options.forEach((option, optionIndex) => {
-      const optionLetter = String.fromCharCode(65 + optionIndex);
-      questionElement.innerHTML += `
-                <label>
-                    <input type="radio" name="question${index}" value="${optionLetter}"> ${option}
-                </label><br>`;
-    });
-
-    content.appendChild(questionElement);
+    questionElement.className = "question-card";
+    questionElement.innerHTML = `
+      <p class="question-text">${index + 1}. ${question.question}</p>
+      <div class="options-container">
+        ${question.options
+          .map(
+            (option, optionIndex) => `
+          <label class="option-label">
+            <input type="radio" name="question${index}" value="${String.fromCharCode(65 + optionIndex)}" />
+            ${option}
+          </label>
+        `
+          )
+          .join("")}
+      </div>
+    `;
+    questionsContainer.appendChild(questionElement);
   });
+
+  const buttonContainer = document.createElement("div");
+  buttonContainer.className = "button-container";
 
   const submitButton = document.createElement("button");
   submitButton.id = "submitBtn";
+  submitButton.className = "primary-button";
   submitButton.textContent = "Submit";
-  content.appendChild(submitButton);
+  buttonContainer.appendChild(submitButton);
 
   const saveButton = document.createElement("button");
   saveButton.id = "saveBtn";
+  saveButton.className = "secondary-button";
   saveButton.textContent = "Save";
-  content.appendChild(saveButton);
+  buttonContainer.appendChild(saveButton);
+
+  content.appendChild(buttonContainer);
 
   submitButton.addEventListener("click", () => {
     calculateScores(questions);
@@ -174,111 +189,3 @@ async function calculateScores(questions) {
     alert("Error submitting quiz. Please try again.");
   }
 }
-
-/* 
-async function saveQuizToFolder(questions) {
-  const userId = localStorage.getItem("loggedInUserId");
-  if (!userId) {
-    alert("User not logged in!");
-    return;
-  }
-
-  const folderList = await getFolders(userId);
-  const content = document.querySelector(".content");
-  content.innerHTML = "<h2>Select a Folder to Save Quiz</h2>";
-
-  if (folderList.length === 0) {
-    const createFolder = confirm(
-      "No folders exist. Would you like to create a new folder?"
-    );
-    if (createFolder) {
-      const folderName = prompt("Enter a name for the new folder:");
-      if (folderName) {
-        await createNewFolder(userId, folderName, questions);
-      } else {
-        alert("Folder creation cancelled.");
-      }
-    } else {
-      alert("Quiz not saved.");
-    }
-  } else {
-    folderList.forEach((folderName) => {
-      const folderButton = document.createElement("button");
-      folderButton.textContent = folderName;
-      folderButton.addEventListener("click", async () => {
-        await saveQuizToExistingFolder(userId, folderName, questions);
-      });
-      content.appendChild(folderButton);
-    });
-
-    const createNewFolderButton = document.createElement("button");
-    createNewFolderButton.textContent = "Create New Folder";
-    createNewFolderButton.addEventListener("click", async () => {
-      const folderName = prompt("Enter a name for the new folder:");
-      if (folderName) {
-        await createNewFolder(userId, folderName, questions);
-      } else {
-        alert("Folder creation cancelled.");
-      }
-    });
-    content.appendChild(createNewFolderButton);
-  }
-}
-
-async function getFolders(userId) {
-  const foldersSnapshot = await getDocs(
-    collection(db, "users", userId, "folders")
-  );
-  const folderList = [];
-  foldersSnapshot.forEach((doc) => {
-    folderList.push(doc.id);
-  });
-  return folderList;
-}
-
-async function saveQuizToExistingFolder(userId, folderName, questions) {
-  const folderRef = doc(db, "users", userId, "folders", folderName);
-  const folderDoc = await getDoc(folderRef);
-
-  if (!folderDoc.exists()) {
-    alert(
-      `Folder "${folderName}" does not exist. Please create the folder first.`
-    );
-    return;
-  }
-
-  const quizData = {
-    quizName: "",
-    timestamp: new Date(),
-    score: 0,
-    questions: questions.map((q, index) => ({
-      question: q.question,
-      options: q.options,
-      correctAnswer: q.answer,
-    })),
-  };
-
-  const quizRef = doc(
-    db,
-    "users",
-    userId,
-    "folders",
-    folderName,
-    "quizzes",
-    `quiz-${Date.now()}`
-  );
-  await setDoc(quizRef, quizData);
-  alert("Quiz saved successfully in the folder!");
-
-  window.location.href =
-    "http://127.0.0.1:5500/BSCS3A-InstaQuiz/InstaQuiz/html/sidebars/sd_quizzes.html";
-}
-
-async function createNewFolder(userId, folderName, questions) {
-  const folderRef = doc(db, "users", userId, "folders", folderName);
-  await setDoc(folderRef, { name: folderName, created: new Date() });
-  alert(`Folder "${folderName}" created successfully!`);
-
-  await saveQuizToExistingFolder(userId, folderName, questions);
-}
-*/
