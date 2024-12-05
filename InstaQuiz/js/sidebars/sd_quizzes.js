@@ -1769,18 +1769,28 @@ function handleClickOnItem(event) {
       if (user) {
         try {
           const userDoc = doc(db, "users", user.uid);
-          const quizzesRef = collection(userDoc, "quizzes");
-          const quizRef = doc(quizzesRef, elementId);
-          const docSnap = await getDoc(quizRef);
 
+          // root
           if (currentLocationOnId == "") {
+            const quizzesRef = collection(userDoc, "quizzes");
+            const quizDoc = doc(quizzesRef, elementId);
+            const docSnap = await getDoc(quizDoc);
             if (docSnap.exists()) {
               const docData = docSnap.data();
               displayQuestions(docData.questions);
+            }
+          }
+          // folder
+          else if (currentLocationOnId !== "") {
+            const folderRef = collection(userDoc, "folders");
+            const folderDoc = doc(folderRef, currentLocationOnId);
+            const quizzesRef = collection(folderDoc, "quizzes");
+            const quizDoc = doc(quizzesRef, elementId);
+            const docSnap = await getDoc(quizDoc);
 
-              // Removes the save button
-              const saveBtn = document.getElementById("saveBtn");
-              saveBtn.remove();
+            if (docSnap.exists()) {
+              const docData = docSnap.data();
+              displayQuestions(docData.questions);
             }
           }
         } catch (error) {}
