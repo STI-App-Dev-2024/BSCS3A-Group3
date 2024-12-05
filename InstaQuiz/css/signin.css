@@ -1,0 +1,143 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #fff;
+    color: #333;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 2rem;
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.logo-highlight {
+    color: #4CAF50;  
+}
+
+
+/* Sico's Note: Naki-click yung logo para bumalik sa Home page */
+#clickable-logo {
+    color:#333;
+    text-decoration: none; 
+    user-select: none; 
+    cursor: pointer; 
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+nav ul a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.auth-buttons .login,
+.auth-buttons .signup {
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+}
+
+.auth-buttons .login {
+    color: #333;
+    background-color: #f8f8f8;
+}
+
+.auth-buttons .signup {
+    color: #fff;
+    background-color: #4CAF50;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.signin-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.signin-box {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.signin-box h2 {
+    margin-bottom: 1rem;
+}
+
+.signin-box input {
+    display: block;
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.signin-box .btn {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.signin-box p {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.signin-box a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.signin-box a:hover {
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: center;
+    }
+}

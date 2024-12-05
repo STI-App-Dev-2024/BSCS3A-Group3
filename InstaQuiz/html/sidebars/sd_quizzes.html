@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaQuiz - Quizzes</title>
+    <link rel="stylesheet" href="../../css/sidebars/sd_quizzes.css">
+
+    
+    <script type="module" src="../../js/sidebars/sd_quizzes.js"></script>
+    <script type="module" src="../../js/profile_drawer.js"></script>
+    <script type="module" src="../../js/navigation.js"></script>
+    <script type="module" src="../../js/convert_function/convertPDF.js"></script>
+
+</head>
+<body>
+    <div class="sidebar">
+        <h1 class="logo">
+            <a href="../homepage.html" id="clickable-logo" class="no-highlight">Insta<span class="highlight">Quiz</span></a>
+        </h1>
+        <nav>
+            <ul>
+                <li><a href="#" id="sd-home-tab"><img src="../../images/home.png" alt="Home Icon" class="icon"> Home</a></li>
+                <li><a href="#" id="sd-quizzes-tab" class="active"><img src="../../images/quizzes.png" alt="Quizzes Icon" class="icon"> Quizzes</a></li>
+                <li><a href="#" id="sd-inbox-tab"><img src="../../images/inbox.png" alt="Inbox Icon" class="icon"> Inbox</a></li>
+                <li><a href="#" id="sd-scores-tab"><img src="../../images/scores.png" alt="Scores Icon" class="icon"> Scores</a></li>
+                <li><a href="#" id="sd-analyze-tab"><img src="../../images/analyze.png" alt="Analyze Icon" class="icon"> Analyze</a></li>
+                <li><a href="#" id="sd-ranking-tab"><img src="../../images/ranking.png" alt="Ranking Icon" class="icon"> Ranking</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button class="menu-btn">&#9776;</button>
+
+            <div class="user-profile">
+                <span class="user-icon">&#128100;</span>
+                <span class="user-name">...</span>
+                <div class="profile-drawer" id="profileDrawer">
+                    <a href="#" class="profile">Profile</a>
+                    <a href="#" class="logout">Logout</a>
+                </div>
+                <a class="arrow-icon">
+                    <img src="../images/down_arrow.png" alt="Down Arrow" class="down-arrow">
+                </a>
+            </div>
+        </header>
+
+        <div class="content">
+            <h1>Manage Quiz</h1>
+            <div class="layer1">
+                <h2 id="root">Root</h2>
+                <h2 id="dirFolderName"></h2>
+
+                <!-- New Folder Button -->
+                <h2 id="openNewFolderBtn" class="new-folder">
+                    <img src="../../images/newfolder.png" alt="newfolder icon" id="newfolderIcon" style="width: 30px; height: 25px;"> 
+                    New Folder
+                </h2>
+                
+            </div>
+
+            <!-- Folder and files container -->
+            <div class="ficontainer" id="fiContainer">
+
+                <div id="folderContainer"> </div>
+                <div id="itemContainer"> </div>
+
+            </div>
+
+
+            <!-- The New Folder Modal -->
+            <div id="myNewFolderModal" class="newFolderModal">
+                <div class="new-folder-modal-content">
+                    <p>New Folder</p>
+                    <input type="text" id="newFolderInput" name="newFolderInput" placeholder="Untitled folder">
+                    <div class ="create-folder-buttons">
+                    <button class="cancel-btn" id="cancelBtn">Cancel</button>
+                    <button class="create-folder-btn" id="createBtn">Create</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Rename Folder Modal -->
+            <div id="myRenameFolderModal" class="renameFolderModal">
+                <div class="rename-folder-modal-content">
+                    <p>Rename Folder</p>
+                    <input type="text" id="renameFolderInput" name="renameFolderInput" placeholder="Untitled folder">
+                    <div class ="rename-folder-buttons">
+                    <button class="rename-cancel-btn" id="renameCancelBtn">Cancel</button>
+                    <button class="rename-folder-btn" id="renameBtn">Rename</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Rename Quiz Modal -->
+            <div id="myRenameQuizModal" class="renameQuizModal">
+                <div class="rename-quiz-modal-content">
+                    <p>Rename Quiz</p>
+                    <input type="text" id="renameQuizInput" name="renameQuizInput" placeholder="Untitled quiz">
+                    <div class ="rename-quiz-buttons">
+                    <button class="rename-quiz-cancel-btn" id="renameQuizCancelBtn">Cancel</button>
+                    <button class="rename-quiz-btn" id="renameQuizBtn">Rename</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Copy Quiz Modal -->
+            <div id="myCopyQuizModal" class="copyQuizModal">
+                <div class="copy-quiz-modal-content">
+                    <div class ="copy-quiz-buttons">
+                    <button class="copy-quiz-cancel-btn" id="copyQuizCancelBtn">Cancel</button>
+                    <button class="copy-quiz-btn" id="copyQuizBtn">Paste here</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Quiz Button -->
+            <button id="openCreateQuizBtn">Create Quiz</button>
+            <button id="dummyBtn">create dummy quiz item</button>
+            <style>
+                #dummyBtn {
+                  background-color: blue; 
+                  border: none;
+                  color: white; 
+                  padding: 10px 20px;
+                  position: fixed;
+                  bottom: 80px;
+                  right: 300px;
+                  font-size: 16px;
+                  cursor: pointer;
+                  border-radius: 5px;
+                  transition: background-color 0.3s;
+                }
+              </style>
+
+            <!-- The Create Quiz Modal -->
+            <div id="myCreateQuizModal" class="createQuizModal">
+                <div class="create-quiz-modal-content">
+                    
+                    <p>Convert PDF to Quiz</p>
+                    <p1>Click the box or drag your file into it to convert your PDF into an interactive quiz!</p1>
+ 
+        
+                    <!-- Tabs Content -->
+                    <div class="tabs-content">
+                        <div id="create-quiz" class="tab-content active">
+                            <div class="upload-area">
+                                <div class="upload-box" id="uploadBox">
+                                    <p1> <img src="../../images/pdf-icon.png" alt="PDFtoQUIZ icon" id="pdftoquizIcon" style="width: 80px; height: 70px;"> </p1>
+                                    <p>Click or drag and drop to upload</p>  
+                                    <p2>PDF size limit: -MB</p2>
+                                    <input type="file" id="fileInput" style="display:none;">
+                                </div>
+                                <div id="fileDetails" style="display:none;">
+                                    <img src="../../images/pdf-icon.png" alt="PDF icon" id="pdfIcon" style="width: 24px; height: 24px;">
+                                    <span id="fileName"></span>
+                                </div>
+
+                                <div class="question-settings">
+                                    <label for="questionCount">Number of Questions:</label>
+                                    <input type="number" id="questionCount" min="1" max="50" value="5">
+                                    
+                                    <fieldset>
+                                        <legend>Select Question Type:</legend>
+                                        <label><input type="radio" name="questionType" value="multipleChoice" checked> Multiple Choice</label>
+                                        <label><input type="radio" name="questionType" value="fillInTheBlanks"> Fill in the Blanks</label>
+                                        <label><input type="radio" name="questionType" value="trueFalse"> True/False</label>
+                                    </fieldset>
+                                </div>
+                                <button class="convert-btn">Convert now!</button>
+                            </div>
+                        </div>
+                        <div id="answered-quiz" class="tab-content">
+                            <p>Content for Answered Quiz tab will go here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

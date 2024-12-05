@@ -1,0 +1,1028 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #fff;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-right: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* sidebar */
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav ul li {
+    margin: 10px 0;
+}
+
+.sidebar nav ul li a {
+    display: block;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+/* sidebar icon */
+.sidebar ul li a img.icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+}
+
+/* sidebar hover and active color */
+.sidebar nav ul li a.active,
+.sidebar nav ul li a:hover {
+    background-color: #f4f4f4;
+    color: #4caf50;
+}
+
+/* InstaQuiz Logo */
+.logo {
+    padding: 20px;
+    font-size: 28px;
+    text-align: center;
+    color: #333;
+}
+
+.logo .highlight {
+    color: #4caf50;
+}
+
+/* Sico's Note: Naki-click yung logo para bumalik sa Home page */
+#clickable-logo {
+    color:#333;
+    text-decoration: none; 
+    user-select: none; 
+    cursor: pointer; 
+}
+
+.main-content {
+    margin-left: 200px;
+    padding: 0px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;  
+    align-items: center;
+    padding: 15px;
+    border-bottom: 2px solid #ccc;
+    background-color: #fff;
+}
+
+.menu-btn {
+    display: none;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-left: auto;
+}
+
+.user-icon {
+    font-size: 24px;
+    margin-right: 4px;
+}
+
+.user-name {
+    margin-top: 3px;
+    margin-right: 4px;
+}
+
+.arrow-icon img {
+    margin-top: 8px;
+    width: 20px;
+    height: auto;
+}
+
+.logout {
+    text-decoration: none;
+    color: #4caf50;
+}
+
+.content {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    margin-left: 60px;
+    margin-right: 60px;
+}
+
+/* Manage Quiz */
+h1 {
+    font-size: 35px;
+    color: #333;
+}
+
+/* Root, New folder icon, New foler text */
+h2 {
+    font-size: 16px;
+    color: #333;
+}
+
+#root {
+    cursor: pointer;
+}
+
+#root:hover {
+    color: #4caf50;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+
+/* layer1 will fill all space available horizontally*/
+.layer1 {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+
+
+
+
+.ffcontainer {
+    width: 100%;
+    margin: 0 auto;
+    overflow-y: auto;
+    height: auto;
+}
+
+/* folders in ffcontainer */
+.folder {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 8px;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    border: 1px solid #aaaaaa;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+.folder:hover {
+    background-color: #c2e4c7;
+}
+/* image in the folder container */
+.folder-image-ff {
+    width: 2%;
+    height: 100%;
+    margin-left: 5px;
+    margin-right: 20px;
+}
+/* text in the folder container */
+.folder-text-ff{
+    margin-top: 4px;
+}
+
+/* items in ffcontainer */
+.item {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 8px;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    border: 1px solid #aaaaaa;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+.item:hover {
+    background-color: #c2e4c7;
+}
+.item-image-ff {
+    width: 1.5%;
+    height: 100%;
+    margin-left: 5px;
+    margin-right: 20px;
+}
+.item-text-ff{
+    margin-top: 4px;
+}
+
+/* image in the folder container */
+.settings-image-ff {
+    width: 1.6%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+
+.share-image-ff {
+    width: 1.5%;
+    height: 100%;
+    margin-right: 24px;
+}
+
+.arrow-image-ff {
+    width: .9%;
+    height: 100%;
+    margin-left: 10px;
+    margin-right: 8px;
+}
+
+.start-image-ff {
+    width: 1.2%;
+    height: 100%;
+    margin-right: 8px;
+}
+
+/* Create quiz button */
+#openCreateQuizBtn {
+    position: fixed;
+    bottom: 70px;
+    right: 100px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+#openCreateQuizBtn:hover {
+    background-color: #45a049;
+}
+
+
+.tabs-nav {
+    display: flex;
+    margin-top: 10px;
+    border-bottom: 2px solid #4caf50;
+    margin-bottom: 20px;
+}
+
+.tabs-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.tabs-nav ul li {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: background-color 0.3s, border-bottom-color 0.3s;
+}
+
+.tabs-nav ul li.active {
+    background-color: #4caf50;
+    color: #fff;
+    border-bottom-color: #fff;
+}
+
+.tabs-content {
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    flex: 1; /* Allow tabs-content to grow and fill space */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+
+.new-folder {
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* This pushes "New Folder" to the right */
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+#newfolderIcon {
+    margin-right: 5px; /* Add space between the icon and text */
+    margin-bottom: 5px;
+}
+
+/* New Folder Modal container, hidden by default */
+.newFolderModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;;
+    opacity: 0;
+}
+
+/* New Folder modal content */
+.new-folder-modal-content {
+    background-color: white;
+    padding: 35px;
+    border: 1px solid #888;
+    width: 23%;
+    height: auto; 
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* New Folder text title */
+.new-folder-modal-content p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #000000;
+    text-align: left;
+    margin: 0;
+}
+
+/* New Folder input */
+#newFolderInput {
+    display: block;
+    font-size: 100%;
+    padding: 13px;
+    margin-top: 15px;
+    margin-bottom: 45px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.create-folder-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.newFolderModal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.newFolderModal.hide {
+    opacity: 0;
+}
+
+/* Cancel Button */
+.cancel-btn {
+    padding: 12px 25px;
+    background-color: white;
+    color: #dd3a3a;
+    border: 2px solid #dd3a3a;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: left;
+    margin-right: 10px;
+}
+.cancel-btn:hover {
+    background-color: #dd3a3a;
+    color: #ffffff;
+}
+
+
+/* Create Folder Button */
+.create-folder-btn {
+    padding: 12px 25px;
+    background-color: #4caf50;
+    color: #fff;
+    border: 2px solid #4caf50;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.create-folder-btn:hover {
+    background-color: #6bc06c;
+    border: 2px solid #6bc06c;
+}
+
+
+/* Rename Folder Modal container, hidden by default */
+.renameFolderModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;;
+    opacity: 0;
+}
+
+
+/* Rename Folder modal content */
+.rename-folder-modal-content {
+    background-color: white;
+    padding: 35px;
+    border: 1px solid #888;
+    width: 23%;
+    height: auto; 
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4); /* Soft shadow effect */
+}
+
+/* Rename Folder text title */
+.rename-folder-modal-content p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #000000;
+    text-align: left;
+    margin: 0;
+}
+
+/* Rename Folder input */
+#renameFolderInput {
+    display: block;
+    font-size: 100%;
+    padding: 13px;
+    margin-top: 15px;
+    margin-bottom: 45px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.rename-folder-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Cancel Button */
+.rename-cancel-btn {
+    padding: 12px 25px;
+    background-color: white;
+    color: #dd3a3a;
+    border: 2px solid #dd3a3a;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: left;
+    margin-right: 10px;
+}
+.rename-cancel-btn:hover {
+    background-color: #dd3a3a;
+    color: #ffffff;
+}
+
+/* Rename Folder Button */
+.rename-folder-btn {
+    padding: 12px 25px;
+    background-color: #4caf50;
+    color: #fff;
+    border: 2px solid #4caf50;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.rename-folder-btn:hover {
+    background-color: #6bc06c;
+    border: 2px solid #6bc06c;
+}
+
+.renameFolderModal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.renameFolderModal.hide {
+    opacity: 0;
+}
+
+/* Rename Quiz modal container, hidden by default */
+.renameQuizModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;;
+    opacity: 0;
+}
+
+/* Rename Quiz modal content */
+.rename-quiz-modal-content {
+    background-color: white;
+    padding: 35px;
+    border: 1px solid #888;
+    width: 23%;
+    height: auto; 
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Rename Quiz text title */
+.rename-quiz-modal-content p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #000000;
+    text-align: left;
+    margin: 0;
+}
+
+/* Rename Quiz input */
+#renameQuizInput {
+    display: block;
+    font-size: 100%;
+    padding: 13px;
+    margin-top: 15px;
+    margin-bottom: 45px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.rename-quiz-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Cancel Button */
+.rename-quiz-cancel-btn {
+    padding: 12px 25px;
+    background-color: white;
+    color: #dd3a3a;
+    border: 2px solid #dd3a3a;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: left;
+    margin-right: 10px;
+}
+.rename-quiz-cancel-btn:hover {
+    background-color: #dd3a3a;
+    color: #ffffff;
+}
+
+/* Rename Quiz Button */
+.rename-quiz-btn {
+    padding: 12px 25px;
+    background-color: #4caf50;
+    color: #fff;
+    border: 2px solid #4caf50;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.rename-quiz-btn:hover {
+    background-color: #6bc06c;
+    border: 2px solid #6bc06c;
+}
+
+/* Copy Quiz Modal */
+.copyQuizModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    overflow: auto;
+    transition: opacity 0.3s ease;;
+    opacity: 0;
+}
+
+.copy-quiz-modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: auto;
+    height: auto;
+    margin-bottom: 5%;
+    border-radius: 8px;
+    box-shadow: 0 0px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Copy Quiz Buttons container */
+.copy-quiz-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Copy Quiz Button */
+.copy-quiz-btn {
+    padding: 12px 15px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    margin-right: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.copy-quiz-btn:hover {
+    background-color: #45a049;
+}
+
+.copyQuizModal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.copyQuizModal.hide {
+    opacity: 0;
+}
+
+/* Cancel Button */
+.copy-quiz-cancel-btn {
+    padding: 12px 30px;
+    background-color: white;
+    color: #dd3a3a;
+    border: 2px solid #dd3a3a;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: left;
+    margin-left: 5px;
+    margin-right: 25px;
+}
+
+.copy-quiz-cancel-btn:hover {
+    background-color: #dd3a3a;
+    color: white;
+}
+
+
+
+/* Create Quiz modal container, hidden by default */
+.createQuizModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;;
+    opacity: 0;
+}
+
+/* Create Quiz modal content */
+.create-quiz-modal-content {
+    background-color: white;
+    padding: 30px;
+    border: 1px solid #888;
+    width: 50%;
+    height: 80%; 
+    max-height: 80%;
+    text-align: center;
+    overflow-y: auto;
+    border-radius: 8px;
+}
+
+.createQuizModal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.createQuizModal.hide {
+    opacity: 0;
+}
+
+/* Convert PDF to QUIZ text */
+.create-quiz-modal-content p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #000000;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Upload area */
+.upload-area {
+    padding: 10px;/
+}
+
+/* pdf to quiz icon */
+.upload-area p1{
+    margin-top: 170px;
+}
+
+/* Click or drag and drop to upload text */
+.upload-area p {
+    font-size: 16px;
+    color: #333;
+}
+
+/* PDF Size Limit text */
+.upload-area p2 {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 170px;
+}
+
+/* upload box */
+.upload-box {
+    border: 2px dashed #ccc;
+    background-color: #fafafa;
+    color: #888;
+    padding: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 100%;
+    height: 350px;
+}
+
+.convert-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+
+.profile-drawer {
+    display: none;  
+    position: absolute;
+    top: 40px;  
+    right: 0;  
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 150px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+.profile-drawer a {
+    display: block;
+    padding: 8px 10px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.profile-drawer a:hover {
+    background-color: #4caf50;
+    color: #fff;
+}
+
+
+
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  color: #333;
+}
+
+.quiz-title {
+  text-align: center;
+  font-size: 24px;
+  margin: 20px 0;
+  color: #4a90e2;
+}
+
+.questions-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.question-card {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.question-text {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.option-label {
+  margin: 5px 0;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #f9f9f9;
+}
+
+.option-label:hover {
+  background: #e6f7ff;
+}
+
+.option-label input {
+  margin-right: 8px;
+}
+
+.button-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.primary-button, .secondary-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.primary-button {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: #357abd;
+}
+
+.secondary-button {
+  background-color: #f5f5f5;
+  color: #333;
+  margin-left: 10px;
+}
+
+.secondary-button:hover {
+  background-color: #ddd;
+}
+
+
+
+
+
+
+
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fcfcfc; /* Very light green */
+    color: #333;
+  }
+  
+  .quiz-title {
+    text-align: center;
+    font-size: 24px;
+    margin: 20px 0;
+    color: #38a169; /* Dark green */
+  }
+  
+  .questions-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #ffffff; /* White background for contrast */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+  
+  .question-card {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #d2e8d6; /* Light green border */
+    border-radius: 8px;
+   }
+  
+  .question-text {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .options-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .option-label {
+    margin: 5px 0;
+    padding: 8px;
+    border: 1px solid #b5d7b8; /* Softer green border */
+    border-radius: 4px;
+    cursor: pointer;
+    background: #ecf9ed; /* Light green background */
+  }
+  
+  .option-label:hover {
+    background: #d4f1d6; /* Slightly darker green on hover */
+  }
+  
+  .option-label input {
+    margin-right: 8px;
+  }
+  
+  .button-container {
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  .primary-button, .secondary-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .primary-button {
+    background-color: #38a169; /* Green for primary buttons */
+    color: white;
+  }
+  
+  .primary-button:hover {
+    background-color: #2f855a; /* Darker green on hover */
+  }
+  
+  .secondary-button {
+    background-color: #edfdf4; /* Very light green */
+    color: #38a169; /* Green text */
+    margin-left: 10px;
+    border: 1px solid #38a169; /* Green border */
+  }
+  
+  .secondary-button:hover {
+    background-color: #c6f6d5; /* Light green on hover */
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaQuiz - Quizzes</title>
+    <link rel="stylesheet" href="../../css/sidebars/sd_quizzes.css">
+
+    
+    <script type="module" src="../../js/sidebars/sd_quizzes.js"></script>
+    <script type="module" src="../../js/profile_drawer.js"></script>
+    <script type="module" src="../../js/navigation.js"></script>
+    <script type="module" src="../../js/convert_function/convertPDF.js"></script>
+
+</head>
+<body>
+    <div class="sidebar">
+        <h1 class="logo">
+            <a href="../homepage.html" id="clickable-logo" class="no-highlight">Insta<span class="highlight">Quiz</span></a>
+        </h1>
+        <nav>
+            <ul>
+                <li><a href="#" id="sd-home-tab"><img src="../../images/home.png" alt="Home Icon" class="icon"> Home</a></li>
+                <li><a href="#" id="sd-quizzes-tab" class="active"><img src="../../images/quizzes.png" alt="Quizzes Icon" class="icon"> Quizzes</a></li>
+                <li><a href="#" id="sd-inbox-tab"><img src="../../images/inbox.png" alt="Inbox Icon" class="icon"> Inbox</a></li>
+                <li><a href="#" id="sd-scores-tab"><img src="../../images/scores.png" alt="Scores Icon" class="icon"> Scores</a></li>
+                <li><a href="#" id="sd-analyze-tab"><img src="../../images/analyze.png" alt="Analyze Icon" class="icon"> Analyze</a></li>
+                <li><a href="#" id="sd-ranking-tab"><img src="../../images/ranking.png" alt="Ranking Icon" class="icon"> Ranking</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <button class="menu-btn">&#9776;</button>
+
+            <div class="user-profile">
+                <span class="user-icon">&#128100;</span>
+                <span class="user-name">Hello, [User Name]!</span>
+
+                <div class="profile-drawer" id="profileDrawer">
+                    <a href="#" class="profile">Profile</a>
+                    <a href="#" class="logout">Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <h1>Manage Quiz</h1>
+            <div class="layer1">
+                <h2>Root</h2>
+                <h2 class="new-folder"> <img src="../../images/newfolder.png" alt="newfolder icon" id="newfolderIcon" style="width: 30px; height: 25px;"> </h2>
+                <h2 >New Folder</h2>
+            </div>
+
+            <button id="openModalBtn">Create Quiz</button>
+
+            <!-- The Create Quiz Modal -->
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    
+                    <p>Convert PDF to Quiz</p>
+                    <p1>Click the box or drag your file into it to convert your PDF into an interactive quiz!</p1>
+
+                    <!-- Tabs Navigation -->
+                    <nav class="tabs-nav">
+                        <ul>
+                            <li class="tab active" data-tab="create-quiz">Create Quiz</li>
+                            <li class="tab" data-tab="answered-quiz">Answered Quiz</li>
+                        </ul>
+                    </nav>
+        
+                    <!-- Tabs Content -->
+                    <div class="tabs-content">
+                        <div id="create-quiz" class="tab-content active">
+                            <div class="upload-area">
+                                <div class="upload-box" id="uploadBox">
+                                    <p1> <img src="../../images/pdf-icon.png" alt="PDFtoQUIZ icon" id="pdftoquizIcon" style="width: 80px; height: 70px;"> </p1>
+                                    <p>Click or drag and drop to upload</p>  
+                                    <p2>PDF size limit: -MB</p2>
+                                    <input type="file" id="fileInput" style="display:none;">
+                                </div>
+                                <div id="fileDetails" style="display:none;">
+                                    <img src="../../images/pdf-icon.png" alt="PDF icon" id="pdfIcon" style="width: 24px; height: 24px;">
+                                    <span id="fileName"></span>
+                                </div>
+
+                                <div class="question-settings">
+                                    <label for="questionCount">Number of Questions:</label>
+                                    <input type="number" id="questionCount" min="1" max="50" value="5">
+                                    
+                                    <fieldset>
+                                        <legend>Select Question Type:</legend>
+                                        <label><input type="radio" name="questionType" value="multipleChoice" checked> Multiple Choice</label>
+                                        <label><input type="radio" name="questionType" value="fillInTheBlanks"> Fill in the Blanks</label>
+                                        <label><input type="radio" name="questionType" value="trueFalse"> True/False</label>
+                                    </fieldset>
+                                </div>
+                                <button class="convert-btn">Convert now!</button>
+                            </div>
+                        </div>
+                        <div id="answered-quiz" class="tab-content">
+                            <p>Content for Answered Quiz tab will go here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaQuiz - Sign In</title>
+    <link rel="stylesheet" href="../css/signin.css">
+    <script type="module" src="../js/signin.js"></script> 
+</head>
+<body>
+
+    <nav>
+        <div class="logo" id="logo" >
+            <h1><a href="welcome.html" id="clickable-logo" class="no-highlight"><span class="logo-highlight">Insta</span>Quiz</a></h1>
+        </div>
+        <div class="auth-buttons">
+            <a href="signin.html" class="login">Login</a>
+            <a href="signup.html" class="signup">Sign up</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="signin-modal">
+            <div class="signin-box">
+                <h2>Sign In</h2>
+                <form id="signin">
+                    <input type="email" id="email" placeholder="Enter your email address" required>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <button type="submit" class="btn">Sign In</button>
+                </form>
+                <p>Don't have an account? <a href="signup.html">Sign Up!</a></p>
+                <div id="signInMessage" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/nav_script.js"></script>
+</body>
+</html>
