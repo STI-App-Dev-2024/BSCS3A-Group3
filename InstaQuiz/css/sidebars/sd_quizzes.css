@@ -674,7 +674,99 @@ h2 {
     color: white;
 }
 
+/* Share Quiz modal container, hidden by default */
+.shareQuizModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;;
+    opacity: 0;
+}
 
+/* Share Quiz modal content */
+.share-quiz-modal-content {
+    background-color: white;
+    padding: 35px;
+    border: 1px solid #888;
+    width: 23%;
+    height: auto; 
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Share Quiz text title */
+.share-quiz-modal-content p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #000000;
+    text-align: left;
+    margin: 0;
+}
+
+/* Share Quiz input */
+#shareQuizInput {
+    display: block;
+    font-size: 100%;
+    padding: 13px;
+    margin-top: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Share Quiz input message */
+#shareQuizInputMessage {
+    display: block;
+    height: 200px;
+    font-size: 100%;
+    padding: 13px;
+    margin-top: 20px;
+    margin-bottom: 45px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.share-quiz-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Cancel Button */
+.share-quiz-cancel-btn {
+    padding: 12px 25px;
+    background-color: white;
+    color: #dd3a3a;
+    border: 2px solid #dd3a3a;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: left;
+    margin-right: 10px;
+}
+.share-quiz-cancel-btn:hover {
+    background-color: #dd3a3a;
+    color: #ffffff;
+}
+
+/* Share Quiz Button */
+.share-quiz-btn {
+    padding: 12px 25px;
+    background-color: #4caf50;
+    color: #fff;
+    border: 2px solid #4caf50;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.share-quiz-btn:hover {
+    background-color: #6bc06c;
+    border: 2px solid #6bc06c;
+}
 
 /* Create Quiz modal container, hidden by default */
 .createQuizModal {
