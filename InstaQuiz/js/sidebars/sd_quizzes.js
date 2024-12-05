@@ -197,12 +197,16 @@ document.addEventListener("DOMContentLoaded", () => {
     currentLocation = "Root";
     currentLocationOnId = [];
 
+    // restores the new folder button
+    newFolderBtn.style.visibility = "visible";
+
+    // removes the directory
+    const dirFolderName = document.getElementById("dirFolderName");
+    dirFolderName.innerHTML = "";
+
     // removes the quiz on previous folder
     const folderContainer = document.getElementById("folderContainer");
     const itemContainer = document.getElementById("itemContainer");
-
-    // hides the new folder button
-    newFolderBtn.style.visibility = "hidden";
 
     // Remove all folders from the previous folder
     while (folderContainer.firstChild) {
@@ -1357,16 +1361,12 @@ function handleClickOnFolder(event) {
     currentLocationOnId = elementId;
     fetchQuizOnFolder();
 
-    // create greater than sign
-    const newH2 = document.createElement("h2");
-    newH2.textContent = ">";
-    newH2.style.marginLeft = "8px";
-    newH2.style.marginRight = "8px";
-
     // create a directory for folder name clicked
     const dirFolderName = document.getElementById("dirFolderName");
-    dirFolderName.textContent = folderName;
-    dirFolderName.parentNode.insertBefore(newH2, dirFolderName);
+    dirFolderName.innerHTML =
+      "&nbsp;&nbsp;" + " > " + "&nbsp;&nbsp;" + folderName;
+
+    dirFolderName.value = dirFolderName;
   } else {
     // do nothing
   }
