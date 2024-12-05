@@ -593,7 +593,34 @@ function FetchRootQuizzes() {
           // Button click event to show alert
           button.addEventListener("click", () => {
             if (choice == "Cut") {
-              alert("you chose cut");
+              var modal = document.getElementById("myCopyQuizModal");
+              var cancelBtn = "copyQuizCancelBtn"
+                ? document.getElementById("copyQuizCancelBtn")
+                : null;
+
+              modal.style.display = "flex";
+              setTimeout(() => {
+                modal.classList.remove("hide");
+                modal.classList.add("show");
+                modal.style.opacity = "1";
+              }, 0);
+
+              function closeModal() {
+                modal.style.opacity = "0";
+                modal.classList.remove("show");
+                modal.classList.add("hide");
+
+                setTimeout(() => {
+                  modal.style.display = "none";
+                }, 300);
+              }
+
+              // Closes the modal when the cancel button is clicked
+              if (cancelBtn) {
+                cancelBtn.onclick = closeModal;
+              }
+
+              CutQuiz(quizId, quizName);
             }
 
             if (choice == "Copy") {
@@ -639,7 +666,9 @@ function FetchRootQuizzes() {
 
                       await deleteDoc(quizRef);
 
-                      location.reload();
+                      Clear();
+                      FetchRootFolders();
+                      FetchRootQuizzes();
                     } catch (error) {
                       console.error("Error deleting document: ", error);
                     }
@@ -862,6 +891,15 @@ async function CopyQuiz(quizId, quizName, inFolderId) {
   const pasteBtn = document.getElementById("copyQuizBtn");
 
   pasteBtn.onclick = async function () {
+    // closes the modal
+    var modal = document.getElementById("myCopyQuizModal");
+    modal.style.opacity = "0";
+    modal.classList.remove("show");
+    modal.classList.add("hide");
+
+    setTimeout(() => {
+      modal.style.display = "none";
+    }, 300);
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
@@ -997,15 +1035,159 @@ async function CopyQuiz(quizId, quizName, inFolderId) {
               }
             }
           }
+        } catch (error) {
+          console.error("Error copying document: ", error);
+        }
+      }
+    });
+  };
+}
 
-          var modal = document.getElementById("myCopyQuizModal");
-          modal.style.opacity = "0";
-          modal.classList.remove("show");
-          modal.classList.add("hide");
+// quiz cut on firestore
+async function CutQuiz(quizId, quizName, inFolderId) {
+  const pasteBtn = document.getElementById("copyQuizBtn");
 
-          setTimeout(() => {
-            modal.style.display = "none";
-          }, 300);
+  pasteBtn.onclick = async function () {
+    // Closes the modal
+    var modal = document.getElementById("myCopyQuizModal");
+    modal.style.opacity = "0";
+    modal.classList.remove("show");
+    modal.classList.add("hide");
+
+    setTimeout(() => {
+      modal.style.display = "none";
+    }, 300);
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          // If its copied from the folder
+          if (inFolderId) {
+            // Copied Quiz
+            const userDoc = doc(db, "users", user.uid);
+            const rootFoldersRef = collection(userDoc, "folders");
+            const folderRef = doc(rootFoldersRef, inFolderId);
+            const quizzesRef = collection(folderRef, "quizzes");
+            const quiz1Ref = doc(quizzesRef, quizId);
+
+            const docSnap = await getDoc(quiz1Ref);
+
+            // If its pasting on the Root
+            if (currentLocationOnId == "") {
+              if (docSnap.exists()) {
+                const docData = docSnap.data();
+
+                var uniqueName = await getUniqueQuizName(quizName); // Get a unique name
+
+                // Add the UniqueName to the document data
+                docData.quizName = uniqueName;
+
+                // Paste location
+                const rootQuizzessRef = collection(userDoc, "quizzes");
+                await addDoc(rootQuizzessRef, docData);
+
+                await deleteDoc(quiz1Ref);
+                Clear();
+                FetchRootFolders();
+                FetchRootQuizzes();
+              } else {
+                console.log("No such document!");
+              }
+            }
+            // if its in the same location
+            else if (currentLocationOnId == inFolderId) {
+              // do nothing
+            }
+
+            //If its pasting on the Folder
+            else {
+              // target folder ref
+              const foldersRef = collection(userDoc, "folders");
+              const targetFolderRef = doc(foldersRef, currentLocationOnId);
+              const targetQuizRef = collection(targetFolderRef, "quizzes");
+
+              if (docSnap.exists()) {
+                const docData = docSnap.data();
+
+                // checks the uniqueness of the quiz name
+                const querySnapshot = await getDocs(targetQuizRef);
+                const existingNames = new Set(
+                  querySnapshot.docs.map((doc) => doc.data().quizName)
+                );
+
+                let uniqueName = quizName;
+                let counter = 1;
+
+                while (existingNames.has(uniqueName)) {
+                  uniqueName = `${quizName} (${counter++})`;
+                }
+
+                var UniqueName = uniqueName;
+
+                // Add the UniqueName to the document data
+                docData.quizName = UniqueName;
+
+                await addDoc(targetQuizRef, docData);
+
+                await deleteDoc(quiz1Ref);
+                fetchQuizOnFolder();
+              } else {
+                console.log("No such document!");
+              }
+            }
+          }
+
+          // Copied from the root
+          else {
+            // copied quiz
+            const userDoc = doc(db, "users", user.uid);
+            const quizzesRef = collection(userDoc, "quizzes");
+            const quizRef = doc(quizzesRef, quizId);
+
+            const docSnap = await getDoc(quizRef);
+
+            // If its pasting on the Root
+            if (currentLocationOnId == "") {
+              // do nothing
+            }
+
+            //If its pasting on the Folder
+            else {
+              // target folder ref
+              const foldersRef = collection(userDoc, "folders");
+              const targetFolderRef = doc(foldersRef, currentLocationOnId);
+              const targetQuizRef = collection(targetFolderRef, "quizzes");
+
+              if (docSnap.exists()) {
+                const docData = docSnap.data();
+
+                // checks the uniqueness of the quiz name
+                const querySnapshot = await getDocs(targetQuizRef);
+                const existingNames = new Set(
+                  querySnapshot.docs.map((doc) => doc.data().quizName)
+                );
+
+                let uniqueName = quizName;
+                let counter = 1;
+
+                while (existingNames.has(uniqueName)) {
+                  uniqueName = `${quizName} (${counter++})`;
+                }
+
+                var UniqueName = uniqueName;
+
+                // Add the UniqueName to the document data
+                docData.quizName = UniqueName;
+
+                await addDoc(targetQuizRef, docData);
+
+                // deletes the quiz
+                await deleteDoc(quizRef);
+                fetchQuizOnFolder();
+              } else {
+                console.log("No such document!");
+              }
+            }
+          }
         } catch (error) {
           console.error("Error copying document: ", error);
         }
@@ -1314,7 +1496,34 @@ const fetchQuizOnFolder = async () => {
           // Button click event to show alert
           button.addEventListener("click", () => {
             if (choice == "Cut") {
-              alert("you chose cut");
+              var modal = document.getElementById("myCopyQuizModal");
+              var cancelBtn = "copyQuizCancelBtn"
+                ? document.getElementById("copyQuizCancelBtn")
+                : null;
+
+              modal.style.display = "flex";
+              setTimeout(() => {
+                modal.classList.remove("hide");
+                modal.classList.add("show");
+                modal.style.opacity = "1";
+              }, 0);
+
+              function closeModal() {
+                modal.style.opacity = "0";
+                modal.classList.remove("show");
+                modal.classList.add("hide");
+
+                setTimeout(() => {
+                  modal.style.display = "none";
+                }, 300);
+              }
+
+              // Closes the modal when the cancel button is clicked
+              if (cancelBtn) {
+                cancelBtn.onclick = closeModal;
+              }
+              var inFolderId = currentLocationOnId;
+              CutQuiz(quizId, quizName, inFolderId);
             }
 
             if (choice == "Copy") {

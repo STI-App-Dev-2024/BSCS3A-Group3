@@ -100,11 +100,6 @@ export function displayQuestions(questions) {
   submitButton.textContent = "Submit";
   buttonContainer.appendChild(submitButton);
 
-  const submitButton2 = document.createElement("button");
-  submitButton2.id = "submitBtn2";
-  submitButton2.className = "primary-button";
-  submitButton2.textContent = "Submit";
-
   const saveButton = document.createElement("button");
   saveButton.id = "saveBtn";
   saveButton.className = "secondary-button";
