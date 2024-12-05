@@ -194,33 +194,36 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   const rootBtn = document.getElementById("root");
   rootBtn.onclick = async function () {
-    currentLocation = "Root";
-    currentLocationOnId = [];
-
-    // restores the new folder button
-    newFolderBtn.style.visibility = "visible";
-
-    // removes the directory
-    const dirFolderName = document.getElementById("dirFolderName");
-    dirFolderName.innerHTML = "";
-
-    // removes the quiz on previous folder
-    const folderContainer = document.getElementById("folderContainer");
-    const itemContainer = document.getElementById("itemContainer");
-
-    // Remove all folders from the previous folder
-    while (folderContainer.firstChild) {
-      folderContainer.removeChild(folderContainer.firstChild);
-    }
-    // Remove all quiz from the previous folder
-    while (itemContainer.firstChild) {
-      itemContainer.removeChild(itemContainer.firstChild);
-    }
-
+    Clear();
     FetchRootFolders();
     FetchRootQuizzes();
   };
 });
+
+function Clear() {
+  currentLocation = "Root";
+  currentLocationOnId = [];
+
+  // restores the new folder button
+  newFolderBtn.style.visibility = "visible";
+
+  // removes the directory
+  const dirFolderName = document.getElementById("dirFolderName");
+  dirFolderName.innerHTML = "";
+
+  // removes the quiz on previous folder
+  const folderContainer = document.getElementById("folderContainer");
+  const itemContainer = document.getElementById("itemContainer");
+
+  // Remove all folders from the previous folder
+  while (folderContainer.firstChild) {
+    folderContainer.removeChild(folderContainer.firstChild);
+  }
+  // Remove all quiz from the previous folder
+  while (itemContainer.firstChild) {
+    itemContainer.removeChild(itemContainer.firstChild);
+  }
+}
 
 // Folder fetch on root and quiz settings
 function FetchRootFolders() {
@@ -287,7 +290,7 @@ function FetchRootFolders() {
         bodyDiv.style.textAlign = "center";
 
         // Create the buttons for choices
-        const choices = ["Cut", "Copy", "Delete", "Rename"];
+        const choices = ["Delete", "Rename"];
         choices.forEach((choice) => {
           const button = document.createElement("button");
           button.innerHTML = choice;
@@ -312,14 +315,6 @@ function FetchRootFolders() {
 
           // Button click event to show alert
           button.addEventListener("click", () => {
-            if (choice == "Cut") {
-              alert("you chose cut");
-            }
-
-            if (choice == "Copy") {
-              alert("you chose copy");
-            }
-
             if (choice == "Delete") {
               const isConfirmed = confirm("Are you sure you want to delete?");
               if (isConfirmed) {
@@ -328,11 +323,21 @@ function FetchRootFolders() {
                     try {
                       const userRef = doc(db, "users", user.uid);
                       const foldersRef = collection(userRef, "folders");
-                      const folderRef = doc(foldersRef, folderId);
+                      const folderDoc = doc(foldersRef, folderId);
+                      const folderRef = collection(folderDoc, "quizzes");
+                      const folderSnapshot = await getDocs(folderRef);
 
-                      await deleteDoc(folderRef);
+                      // Deletes all quizzes on folder
+                      folderSnapshot.forEach(async (doc) => {
+                        await deleteDoc(doc.ref);
+                      });
 
-                      location.reload();
+                      // Deletes the folder
+                      await deleteDoc(folderDoc);
+
+                      Clear();
+                      FetchRootFolders();
+                      FetchRootQuizzes();
                     } catch (error) {
                       console.error("Error deleting document: ", error);
                     }
@@ -853,64 +858,143 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // quiz copy on firestore
-async function CopyQuiz(quizId, quizName) {
+async function CopyQuiz(quizId, quizName, inFolderId) {
   const pasteBtn = document.getElementById("copyQuizBtn");
 
   pasteBtn.onclick = async function () {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          // copied quiz ref
-          const userDoc = doc(db, "users", user.uid);
-          const quizzesRef = collection(userDoc, "quizzes");
-          const quizRef = doc(quizzesRef, quizId);
-          const docSnap = await getDoc(quizRef);
+          // If its copied from the folder
+          if (inFolderId) {
+            // Copied Quiz
+            const userDoc = doc(db, "users", user.uid);
+            const rootFoldersRef = collection(userDoc, "folders");
+            const folderRef = doc(rootFoldersRef, inFolderId);
+            const quizzesRef = collection(folderRef, "quizzes");
+            const quiz1Ref = doc(quizzesRef, quizId);
 
-          if (currentLocationOnId == "") {
-            if (docSnap.exists()) {
-              const docData = docSnap.data();
+            const docSnap = await getDoc(quiz1Ref);
 
-              var uniqueName = await getUniqueQuizName(quizName); // Get a unique name
+            // If its pasting on the Root
+            if (currentLocationOnId == "") {
+              if (docSnap.exists()) {
+                const docData = docSnap.data();
 
-              // Add the UniqueName to the document data
-              docData.quizName = uniqueName;
+                var uniqueName = await getUniqueQuizName(quizName); // Get a unique name
 
-              await addDoc(quizzesRef, docData);
-              location.reload();
-            } else {
-              console.log("No such document!");
-            }
-          } else {
-            // target folder ref
-            const foldersRef = collection(userDoc, "folders");
-            const targetFolderRef = doc(foldersRef, currentLocationOnId);
-            const targetQuizRef = collection(targetFolderRef, "quizzes");
+                // Add the UniqueName to the document data
+                docData.quizName = uniqueName;
 
-            if (docSnap.exists()) {
-              const docData = docSnap.data();
-
-              // checks the uniqueness of the quiz name
-              const querySnapshot = await getDocs(targetQuizRef);
-              const existingNames = new Set(
-                querySnapshot.docs.map((doc) => doc.data().quizName)
-              );
-
-              let uniqueName = quizName;
-              let counter = 1;
-
-              while (existingNames.has(uniqueName)) {
-                uniqueName = `${quizName} (${counter++})`;
+                // Paste location
+                const rootQuizzessRef = collection(userDoc, "quizzes");
+                await addDoc(rootQuizzessRef, docData);
+                Clear();
+                FetchRootFolders();
+                FetchRootQuizzes();
+              } else {
+                console.log("No such document!");
               }
+            }
 
-              var UniqueName = uniqueName;
+            //If its pasting on the Folder
+            else {
+              // target folder ref
+              const foldersRef = collection(userDoc, "folders");
+              const targetFolderRef = doc(foldersRef, currentLocationOnId);
+              const targetQuizRef = collection(targetFolderRef, "quizzes");
 
-              // Add the UniqueName to the document data
-              docData.quizName = UniqueName;
+              if (docSnap.exists()) {
+                const docData = docSnap.data();
 
-              await addDoc(targetQuizRef, docData);
-              fetchQuizOnFolder();
-            } else {
-              console.log("No such document!");
+                // checks the uniqueness of the quiz name
+                const querySnapshot = await getDocs(targetQuizRef);
+                const existingNames = new Set(
+                  querySnapshot.docs.map((doc) => doc.data().quizName)
+                );
+
+                let uniqueName = quizName;
+                let counter = 1;
+
+                while (existingNames.has(uniqueName)) {
+                  uniqueName = `${quizName} (${counter++})`;
+                }
+
+                var UniqueName = uniqueName;
+
+                // Add the UniqueName to the document data
+                docData.quizName = UniqueName;
+
+                await addDoc(targetQuizRef, docData);
+                fetchQuizOnFolder();
+              } else {
+                console.log("No such document!");
+              }
+            }
+          }
+
+          // Copied from the root
+          else {
+            // copied quiz
+            const userDoc = doc(db, "users", user.uid);
+            const quizzesRef = collection(userDoc, "quizzes");
+            const quizRef = doc(quizzesRef, quizId);
+
+            const docSnap = await getDoc(quizRef);
+
+            // If its pasting on the Root
+            if (currentLocationOnId == "") {
+              // copied quiz ref
+              if (docSnap.exists()) {
+                const docData = docSnap.data();
+
+                var uniqueName = await getUniqueQuizName(quizName); // Get a unique name
+
+                // Add the UniqueName to the document data
+                docData.quizName = uniqueName;
+
+                await addDoc(quizzesRef, docData);
+                Clear();
+                FetchRootFolders();
+                FetchRootQuizzes();
+              } else {
+                console.log("No such document!");
+              }
+            }
+
+            //If its pasting on the Folder
+            else {
+              // target folder ref
+              const foldersRef = collection(userDoc, "folders");
+              const targetFolderRef = doc(foldersRef, currentLocationOnId);
+              const targetQuizRef = collection(targetFolderRef, "quizzes");
+
+              if (docSnap.exists()) {
+                const docData = docSnap.data();
+
+                // checks the uniqueness of the quiz name
+                const querySnapshot = await getDocs(targetQuizRef);
+                const existingNames = new Set(
+                  querySnapshot.docs.map((doc) => doc.data().quizName)
+                );
+
+                let uniqueName = quizName;
+                let counter = 1;
+
+                while (existingNames.has(uniqueName)) {
+                  uniqueName = `${quizName} (${counter++})`;
+                }
+
+                var UniqueName = uniqueName;
+
+                // Add the UniqueName to the document data
+                docData.quizName = UniqueName;
+
+                await addDoc(targetQuizRef, docData);
+                fetchQuizOnFolder();
+              } else {
+                console.log("No such document!");
+              }
             }
           }
 
@@ -970,7 +1054,7 @@ function RenameFolder(folderId) {
 }
 
 // quiz rename on firestore
-function RenameQuiz(quizId) {
+function RenameQuiz(quizId, inFolderId) {
   onAuthStateChanged(auth, (user) => {
     const renamedQuiz = document.getElementById("renameQuizBtn");
     if (user) {
@@ -981,29 +1065,55 @@ function RenameQuiz(quizId) {
         if (renamedQuiz == "") {
           renamedQuiz = "Untitled quiz"; // Default name if input is empty
         }
-        renamedQuiz = await getUniqueQuizName(renamedQuiz); // Get a unique name
-
         await CheckRenameQuiz(renamedQuiz);
 
         async function CheckRenameQuiz() {
           onAuthStateChanged(auth, async (user) => {
             if (user) {
               try {
-                const userRef = doc(db, "users", user.uid);
-                const quizzesRef = collection(userRef, "quizzes");
-                const quizRef = doc(quizzesRef, quizId);
+                if (inFolderId) {
+                  const userRef = doc(db, "users", user.uid);
+                  const foldersRef = collection(userRef, "folders");
+                  const quizDoc = doc(foldersRef, currentLocationOnId);
+                  const quizRef = collection(quizDoc, "quizzes");
+                  const quizRef1 = doc(quizRef, quizId);
 
-                await setDoc(
-                  quizRef,
-                  { quizName: renamedQuiz },
-                  { merge: true }
-                );
-                location.reload();
+                  await setDoc(
+                    quizRef1,
+                    { quizName: renamedQuiz },
+                    { merge: true }
+                  );
+                  fetchQuizOnFolder();
+                } else {
+                  const userRef = doc(db, "users", user.uid);
+                  const quizzesRef = collection(userRef, "quizzes");
+                  const quizRef = doc(quizzesRef, quizId);
+
+                  await setDoc(
+                    quizRef,
+                    { quizName: renamedQuiz },
+                    { merge: true }
+                  );
+
+                  Clear();
+                  FetchRootFolders();
+                  FetchRootQuizzes();
+                }
               } catch (error) {
                 console.error("Error renaming quiz: ", error.message);
                 console.error("Error renaming quiz: ", error);
                 alert("Failed to renaming quiz.");
               }
+
+              var modal = document.getElementById("myRenameQuizModal");
+
+              modal.style.opacity = "0";
+              modal.classList.remove("show");
+              modal.classList.add("hide");
+
+              setTimeout(() => {
+                modal.style.display = "none";
+              }, 300);
             }
           });
         }
@@ -1208,7 +1318,34 @@ const fetchQuizOnFolder = async () => {
             }
 
             if (choice == "Copy") {
-              alert("you chose copy");
+              var modal = document.getElementById("myCopyQuizModal");
+              var cancelBtn = "copyQuizCancelBtn"
+                ? document.getElementById("copyQuizCancelBtn")
+                : null;
+
+              modal.style.display = "flex";
+              setTimeout(() => {
+                modal.classList.remove("hide");
+                modal.classList.add("show");
+                modal.style.opacity = "1";
+              }, 0);
+
+              function closeModal() {
+                modal.style.opacity = "0";
+                modal.classList.remove("show");
+                modal.classList.add("hide");
+
+                setTimeout(() => {
+                  modal.style.display = "none";
+                }, 300);
+              }
+
+              // Closes the modal when the cancel button is clicked
+              if (cancelBtn) {
+                cancelBtn.onclick = closeModal;
+              }
+              var inFolderId = currentLocationOnId;
+              CopyQuiz(quizId, quizName, inFolderId);
             }
 
             if (choice == "Delete") {
@@ -1238,7 +1375,46 @@ const fetchQuizOnFolder = async () => {
             }
 
             if (choice == "Rename") {
-              alert("you chose rename");
+              var modal = document.getElementById("myRenameQuizModal");
+              var cancelBtn = "renameQuizCancelBtn"
+                ? document.getElementById("renameQuizCancelBtn")
+                : null;
+
+              modal.style.display = "flex";
+              setTimeout(() => {
+                modal.classList.remove("hide");
+                modal.classList.add("show");
+                modal.style.opacity = "1";
+              }, 0);
+
+              function closeModal() {
+                modal.style.opacity = "0";
+                modal.classList.remove("show");
+                modal.classList.add("hide");
+
+                setTimeout(() => {
+                  modal.style.display = "none";
+                }, 300);
+              }
+
+              // Closes the modal when the cancel button is clicked
+              if (cancelBtn) {
+                cancelBtn.onclick = closeModal;
+              }
+
+              // Close the modal when clicking anywhere outside of the modal content
+              window.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                  closeModal();
+                }
+              });
+
+              // Gets the current quiz name
+              let renamedQuiz = document.getElementById("renameQuizInput");
+              renamedQuiz.value = quizName;
+
+              var inFolderId = true;
+              RenameQuiz(quizId, inFolderId);
             }
 
             // hides window
