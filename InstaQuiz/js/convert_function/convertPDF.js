@@ -53,13 +53,14 @@ document.querySelector(".convert-btn").addEventListener("click", async () => {
     }
 
     displayQuestions(data.questions);
+    console.log("converted", data.questions);
   } catch (error) {
     console.error("Error fetching questions:", error);
     alert("Error fetching questions. Please try again.");
   }
 });
 
-function displayQuestions(questions) {
+export function displayQuestions(questions) {
   const content = document.querySelector(".content");
   content.innerHTML = `
     <h2 class="quiz-title">Quiz Questions</h2>
@@ -77,7 +78,9 @@ function displayQuestions(questions) {
           .map(
             (option, optionIndex) => `
           <label class="option-label">
-            <input type="radio" name="question${index}" value="${String.fromCharCode(65 + optionIndex)}" />
+            <input type="radio" name="question${index}" value="${String.fromCharCode(
+              65 + optionIndex
+            )}" />
             ${option}
           </label>
         `
@@ -97,6 +100,11 @@ function displayQuestions(questions) {
   submitButton.textContent = "Submit";
   buttonContainer.appendChild(submitButton);
 
+  const submitButton2 = document.createElement("button");
+  submitButton2.id = "submitBtn2";
+  submitButton2.className = "primary-button";
+  submitButton2.textContent = "Submit";
+
   const saveButton = document.createElement("button");
   saveButton.id = "saveBtn";
   saveButton.className = "secondary-button";
@@ -106,6 +114,7 @@ function displayQuestions(questions) {
   content.appendChild(buttonContainer);
 
   submitButton.addEventListener("click", () => calculateScores(questions));
+  submitButton2.addEventListener("click", () => calculateScores2(questions));
   saveButton.addEventListener("click", () => promptAndSaveQuiz(questions));
 }
 
@@ -215,4 +224,8 @@ async function calculateScores(questions) {
     console.error("Error saving score:", error);
     alert("Error saving score. Please try again.");
   }
+}
+
+async function calculateScores2(questions) {
+  console.log("nice!");
 }

@@ -503,6 +503,7 @@ function FetchRootQuizzes() {
     const item = document.createElement("div");
 
     item.classList.add("item"); // for css
+    item.id = `${quizId}`;
 
     // Quiz image element
     const img = document.createElement("img");
@@ -1345,16 +1346,13 @@ const fetchQuizOnFolder = async () => {
   getClickedFolders();
 };
 
-// Function to handle click events
-function handleClick(event) {
+// Function to handle click events on folder
+const folderContainer = document.getElementById("folderContainer");
+function handleClickOnFolder(event) {
   const elementId = event.target.id;
   const folderName = event.target.textContent;
 
-  console.log(elementId);
-
-  if (elementId == "folderContainer" || elementId == "settingsFolder") {
-    // do nothing
-  } else {
+  if (elementId !== "folderContainer" && elementId !== "settingsFolder") {
     currentLocation = folderName;
     currentLocationOnId = elementId;
     fetchQuizOnFolder();
@@ -1369,8 +1367,42 @@ function handleClick(event) {
     const dirFolderName = document.getElementById("dirFolderName");
     dirFolderName.textContent = folderName;
     dirFolderName.parentNode.insertBefore(newH2, dirFolderName);
+  } else {
+    // do nothing
   }
 }
+folderContainer.addEventListener("click", handleClickOnFolder);
 
-const element = document.getElementById("folderContainer");
-element.addEventListener("click", handleClick);
+// Function to handle click events on quiz
+import { displayQuestions } from "../convert_function/convertPDF.js";
+const itemContainer = document.getElementById("itemContainer");
+function handleClickOnItem(event) {
+  const elementId = event.target.id;
+
+  if (elementId !== "itemContainer" && elementId !== "settingsFolder") {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDoc = doc(db, "users", user.uid);
+          const quizzesRef = collection(userDoc, "quizzes");
+          const quizRef = doc(quizzesRef, elementId);
+          const docSnap = await getDoc(quizRef);
+
+          if (currentLocationOnId == "") {
+            if (docSnap.exists()) {
+              const docData = docSnap.data();
+              displayQuestions(docData.questions);
+
+              // Removes the save button
+              const saveBtn = document.getElementById("saveBtn");
+              saveBtn.remove();
+            }
+          }
+        } catch (error) {}
+      }
+    });
+  } else {
+    // do nothing
+  }
+}
+itemContainer.addEventListener("click", handleClickOnItem);
