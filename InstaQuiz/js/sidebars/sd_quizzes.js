@@ -818,7 +818,8 @@ function FetchRootQuizzes() {
         }
       });
       var inFolder = false;
-      ShareQuiz(inFolder);
+      var inFolderId = currentLocationOnId;
+      ShareQuiz(quizId, inFolder, inFolderId);
     });
 
     // Start image element
@@ -928,7 +929,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // share quiz to other user
-async function ShareQuiz(inFolder) {
+async function ShareQuiz(quizId, inFolder, inFolderId) {
   const shareBtn = document.getElementById("shareQuizBtn");
 
   shareBtn.onclick = async function () {
@@ -962,23 +963,81 @@ async function ShareQuiz(inFolder) {
 
             // If its in the folder
             if (inFolder) {
-              console.log("in folder");
+              // sharing quiz location (copy)
+              const userDoc = doc(db, "users", user.uid);
+              const rootFoldersRef = collection(userDoc, "folders");
+              const folderRef = doc(rootFoldersRef, inFolderId);
+              const quizzesRef = collection(folderRef, "quizzes");
+              const quiz1Ref = doc(quizzesRef, quizId);
+
+              // gets the sharing quiz data
+              const docSnap = await getDoc(quiz1Ref);
+              const docData = docSnap.data();
+
+              // gets the name of the sender
+              const docSnapSender = await getDoc(userDoc);
+              const firstName = docSnapSender.data().firstName;
+              const lastName = docSnapSender.data().lastName;
+
+              // gets the message
+              var shareQuizInputMessage = document.getElementById(
+                "shareQuizInputMessage"
+              ).value;
+
+              // Adds the message and sender's details to an array in docData
+              if (!Array.isArray(docData.sharedDetails)) {
+                docData.sharedDetails = [];
+              }
+
+              docData.sharedDetails.push({
+                message: shareQuizInputMessage,
+                senderFirstName: firstName,
+                senderLastName: lastName,
+              });
+
+              // target location (paste)
+              const sharedRef = collection(db, "users", userTargetId, "shared");
+              await addDoc(sharedRef, docData, { merge: true });
             }
 
             // In the root
             else if (!inFolder) {
-              console.log("not in folder");
+              // sharing quiz location (copy)
+              const userDoc = doc(db, "users", user.uid);
+              const quizzesRef = collection(userDoc, "quizzes");
+              const quizRef = doc(quizzesRef, quizId);
+
+              // gets the sharing quiz data
+              const docSnap = await getDoc(quizRef);
+              const docData = docSnap.data();
+
+              // gets the name of the sender
+              const docSnapSender = await getDoc(userDoc);
+              const firstName = docSnapSender.data().firstName;
+              const lastName = docSnapSender.data().lastName;
+
+              // gets the message
+              var shareQuizInputMessage = document.getElementById(
+                "shareQuizInputMessage"
+              ).value;
+
+              // Adds the message and sender's details to an array in docData
+              if (!Array.isArray(docData.sharedDetails)) {
+                docData.sharedDetails = [];
+              }
+
+              docData.sharedDetails.push({
+                message: shareQuizInputMessage,
+                senderFirstName: firstName,
+                senderLastName: lastName,
+              });
+
+              // target location (paste)
+              const sharedRef = collection(db, "users", userTargetId, "shared");
+              await addDoc(sharedRef, docData, { merge: true });
             } else {
               console.log("error");
             }
-
-            // target location
-            const usersCollection = collection(
-              db,
-              "users",
-              userTargetId,
-              "shared"
-            );
 
             return userTargetId;
           } else {
@@ -1780,6 +1839,48 @@ const fetchQuizOnFolder = async () => {
     const shareImg = document.createElement("img");
     shareImg.src = "../../images/share.png";
     shareImg.classList.add("share-image-ff"); // for css
+
+    // Share clicked
+    shareImg.addEventListener("click", function () {
+      var modal = document.getElementById("myShareQuizModal");
+      var cancelBtn = "shareQuizCancelBtn"
+        ? document.getElementById("shareQuizCancelBtn")
+        : null;
+      var shareQuizText = document.getElementById("shareQuizText");
+      shareQuizText.innerHTML = "Share " + '"' + quizName + '"';
+
+      modal.style.display = "flex";
+      setTimeout(() => {
+        modal.classList.remove("hide");
+        modal.classList.add("show");
+        modal.style.opacity = "1";
+      }, 0);
+
+      function closeModal() {
+        modal.style.opacity = "0";
+        modal.classList.remove("show");
+        modal.classList.add("hide");
+
+        setTimeout(() => {
+          modal.style.display = "none";
+        }, 300);
+      }
+
+      // Closes the modal when the cancel button is clicked
+      if (cancelBtn) {
+        cancelBtn.onclick = closeModal;
+      }
+
+      // Close the modal when clicking anywhere outside of the modal content
+      window.addEventListener("click", function (event) {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+      var inFolder = true;
+      var inFolderId = currentLocationOnId;
+      ShareQuiz(quizId, inFolder, inFolderId);
+    });
 
     // Start image element
     const startImg = document.createElement("img");
