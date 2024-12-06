@@ -817,6 +817,8 @@ function FetchRootQuizzes() {
           closeModal();
         }
       });
+      var inFolder = false;
+      ShareQuiz(inFolder);
     });
 
     // Start image element
@@ -924,6 +926,74 @@ onAuthStateChanged(auth, (user) => {
     };
   }
 });
+
+// share quiz to other user
+async function ShareQuiz(inFolder) {
+  const shareBtn = document.getElementById("shareQuizBtn");
+
+  shareBtn.onclick = async function () {
+    // closes the modal
+    var modal = document.getElementById("myShareQuizModal");
+    modal.style.opacity = "0";
+    modal.classList.remove("show");
+    modal.classList.add("hide");
+
+    setTimeout(() => {
+      modal.style.display = "none";
+    }, 300);
+
+    var shareQuizInput = document.getElementById("shareQuizInput").value;
+    shareQuizInput = shareQuizInput.trim();
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const usersCollection = collection(db, "users");
+
+          const emailQuery = query(
+            usersCollection,
+            where("email", "==", shareQuizInput)
+          );
+
+          const querySnapshot = await getDocs(emailQuery);
+
+          if (!querySnapshot.empty) {
+            const userTargetId = querySnapshot.docs[0].id;
+
+            // If its in the folder
+            if (inFolder) {
+              console.log("in folder");
+            }
+
+            // In the root
+            else if (!inFolder) {
+              console.log("not in folder");
+            } else {
+              console.log("error");
+            }
+
+            // target location
+            const usersCollection = collection(
+              db,
+              "users",
+              userTargetId,
+              "shared"
+            );
+
+            return userTargetId;
+          } else {
+            alert(
+              "there's no such email address that is registered in InstaQuiz."
+            );
+            return null;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    });
+  };
+}
 
 // quiz copy on firestore
 async function CopyQuiz(quizId, quizName, inFolderId) {
