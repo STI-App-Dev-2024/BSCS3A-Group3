@@ -113,28 +113,26 @@ async function fetchUserScores() {
 
         const { db, auth } = firebase;
 
-        // Use onAuthStateChanged safely
-        const unsubscribe = onAuthStateChanged(
+         const unsubscribe = onAuthStateChanged(
             auth, 
             async (user) => {
-                // Unsubscribe immediately to prevent multiple listeners
-                unsubscribe();
+                 unsubscribe();
 
                 if (user) {
                     try {
-                        // Reference to the user's quizzes collection
+                        
                         const quizzesRef = collection(db, 'users', user.uid, 'quizzes');
                         
-                        // Get all quiz documents
+                       
                         const quizzesSnapshot = await getDocs(quizzesRef);
                         
-                        // Convert snapshot to array of quiz data
+                      
                         const quizData = quizzesSnapshot.docs.map(doc => ({
                             id: doc.id,
                             ...doc.data()
                         }));
 
-                        // Create chart if we have data
+                        
                         if (quizData.length > 0) {
                             createScoresChart(quizData);
                             resolve(quizData);
@@ -159,12 +157,12 @@ async function fetchUserScores() {
     });
 }
 
-// Call the function to fetch and display scores
+ 
 document.addEventListener('DOMContentLoaded', () => {
     fetchUserScores().catch(error => {
         console.error('Failed to fetch user scores:', error);
         
-        // Optionally, display a user-friendly message
+       
         const chartContainer = document.querySelector('.chart-container');
         if (chartContainer) {
             chartContainer.innerHTML = `
@@ -174,5 +172,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Export the function in case it's needed elsewhere
+
 export { fetchUserScores };

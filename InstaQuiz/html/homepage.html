@@ -8,7 +8,7 @@
     <script type="module" src="../js/homepage.js"></script>
     <script type="module" src="../js/profile_drawer.js"></script>
     <script type="module" src="../js/navigation.js"></script>
- 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="sidebar">
@@ -26,12 +26,10 @@
             </ul>
         </nav>
     </div>
-    
-    <div class="main-content">
 
+    <div class="main-content">
         <header>
             <button class="menu-btn">&#9776;</button>
-           
             <div class="user-profile">
                 <span class="user-icon">&#128100;</span>
                 <span class="user-name">...</span>  
@@ -44,10 +42,20 @@
                 </a>
             </div>
         </header>
+
         <div class="content">
-            <h1>Dashboard</h1>   
-            
+            <h1>Dashboard</h1> 
+
+            <div class="quiz-stats">
+                <h2>Quiz Stats</h2>
+                <p>Total Quizzes Converted: <span id="total-quizzes">0</span></p>
+                <p>Highest Score: <span id="highest-score">0</span></p>
+                <p>Lowest Score: <span id="lowest-score">0</span></p>
+            </div>
+
+            <canvas id="scoreChart"></canvas>
         </div>
     </div>
+
 </body>
 </html>
