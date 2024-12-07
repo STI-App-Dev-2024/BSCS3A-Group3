@@ -17,15 +17,14 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Fetch and display shared quizzes for the logged-in user
-const fetchSharedQuizzes = async (userId) => {
+ const fetchSharedQuizzes = async (userId) => {
     try {
-        // Reference the shared sub-collection
+       
         const sharedRef = collection(db, `users/${userId}/shared`);
         const querySnapshot = await getDocs(sharedRef);
 
         const container = document.getElementById("shared-quizzes-container");
-        container.innerHTML = ""; // Clear any previous content
+        container.innerHTML = "";  
 
         if (querySnapshot.empty) {
             container.innerHTML = "<p>No shared quizzes available.</p>";
@@ -33,8 +32,7 @@ const fetchSharedQuizzes = async (userId) => {
             querySnapshot.forEach((doc) => {
                 const quiz = doc.data();
 
-                // Create HTML for each shared quiz
-                const quizElement = document.createElement("div");
+                 const quizElement = document.createElement("div");
                 quizElement.classList.add("quiz-item");
                 quizElement.innerHTML = `
                     <h2>${quiz.quizName}</h2>
@@ -51,17 +49,15 @@ const fetchSharedQuizzes = async (userId) => {
     }
 };
 
-// Handle user authentication state
-onAuthStateChanged(auth, (user) => {
+ onAuthStateChanged(auth, (user) => {
     if (user) {
-        fetchSharedQuizzes(user.uid); // Fetch quizzes shared with the logged-in user
+        fetchSharedQuizzes(user.uid);  
     } else {
         console.log("User is not authenticated.");
     }
 });
 
-// Function to view a quiz
+ 
 window.viewQuiz = (quizId) => {
-    // Redirect or display the quiz details
-    window.location.href = `../quizzes/quiz.html?id=${quizId}`;
+     window.location.href = `../quizzes/quiz.html?id=${quizId}`;
 };
