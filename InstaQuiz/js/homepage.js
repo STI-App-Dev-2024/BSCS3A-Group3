@@ -80,7 +80,7 @@ function createScoresChart(quizData) {
     const highestScore = Math.max(...quizData.map(q => q.score), 0);
     const lowestScore = Math.min(...quizData.map(q => q.score), 100);
 
-    // Update the DOM elements with the latest data
+    
     document.getElementById('total-quizzes').textContent = totalQuizzes;
     document.getElementById('highest-score').textContent = highestScore;
     document.getElementById('lowest-score').textContent = lowestScore;
