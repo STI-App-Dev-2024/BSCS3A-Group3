@@ -19,6 +19,7 @@ const lastNameInput = document.getElementById('last-name');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const confirmPasswordInput = document.getElementById('confirm-password');
+const yearLevelInput = document.getElementById('year-level'); // Add year level input reference
 
 // Handle form submission
 signupForm.addEventListener('submit', async(e) => {
@@ -30,6 +31,7 @@ signupForm.addEventListener('submit', async(e) => {
     const email = emailInput.value;
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
+    const yearLevel = yearLevelInput.value; // Get selected year level
 
     if (password !== confirmPassword) {
         alert("Passwords do not match!");
@@ -48,24 +50,20 @@ signupForm.addEventListener('submit', async(e) => {
         });
 
         //save to firestore collection
-
         const userRef = doc(db, 'users', user.uid);
         await setDoc(userRef, {
             firstName: firstName,
             middleName: middleName || ``,
             lastName: lastName,
-            email: email
+            email: email,
+            yearLevel: yearLevel // Add year level to Firestore document
         });
         
         //go to homepage or dashboard
-
         window.location.href = `homepage.html`;
 
     } catch (error){
         console.error("Error signing up: ",error.message);
         alert("Error signing up: "+error.message);
     }
-    
 });
-
-     

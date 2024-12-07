@@ -130,7 +130,11 @@ header {
     color: #4CAF50;
     text-decoration: none;
 }
-
+.signin-box label {
+    display: block;
+    text-align: left;
+    margin-bottom: 0.5rem;
+}
 .signin-box a:hover {
     text-decoration: underline;
 }
