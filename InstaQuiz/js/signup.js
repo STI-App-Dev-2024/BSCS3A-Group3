@@ -9,7 +9,7 @@ import { firebaseConfig } from '../js/firebase.js';
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app); // Initialize Firestore
+const db = getFirestore(app);  
 
 // Get references to the form and input fields
 const signupForm = document.getElementById('signup-form');
@@ -19,9 +19,9 @@ const lastNameInput = document.getElementById('last-name');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const confirmPasswordInput = document.getElementById('confirm-password');
-const yearLevelInput = document.getElementById('year-level'); // Add year level input reference
+const yearLevelInput = document.getElementById('year-level');  
 
-// Handle form submission
+ 
 signupForm.addEventListener('submit', async(e) => {
     e.preventDefault();
 
@@ -31,7 +31,7 @@ signupForm.addEventListener('submit', async(e) => {
     const email = emailInput.value;
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
-    const yearLevel = yearLevelInput.value; // Get selected year level
+    const yearLevel = yearLevelInput.value;  
 
     if (password !== confirmPassword) {
         alert("Passwords do not match!");
@@ -43,23 +43,22 @@ signupForm.addEventListener('submit', async(e) => {
         const user = userCredentials.user;
 
         console.log("User signed up : ",user);
-
-        //update profile display with name
+ 
         await updateProfile(user, {
             displayName: `${firstName} ${middleName ? middleName + ` ` : ``} ${lastName}`
         });
 
-        //save to firestore collection
+       
         const userRef = doc(db, 'users', user.uid);
         await setDoc(userRef, {
             firstName: firstName,
             middleName: middleName || ``,
             lastName: lastName,
             email: email,
-            yearLevel: yearLevel // Add year level to Firestore document
+            yearLevel: yearLevel  
         });
         
-        //go to homepage or dashboard
+       
         window.location.href = `homepage.html`;
 
     } catch (error){
