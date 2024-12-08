@@ -2011,3 +2011,16 @@ function handleClickOnItem(event) {
   }
 }
 itemContainer.addEventListener("click", handleClickOnItem);
+function closeWindow() {
+  const windowElement = document.querySelector('.window');
+  if (windowElement) {
+    windowElement.classList.remove('active');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const closeButtons = document.querySelectorAll('.close-button');
+  closeButtons.forEach(button => {
+    button.addEventListener('click', closeWindow);
+  });
+});
