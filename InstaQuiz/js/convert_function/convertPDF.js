@@ -259,8 +259,7 @@ async function promptAndSaveQuiz(questions) {
         await saveQuiz(quizName, questions);
         alert("Quiz saved successfully!");
 
-        window.location.href =
-          "../../../../InstaQuiz/html/sidebars/sd_quizzes.html";
+        window.location.href = "../../html/sidebars/sd_quizzes.html";
       } else {
         alert("Quiz name is already taken. Please choose another name.");
       }
