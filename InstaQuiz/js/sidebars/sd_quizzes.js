@@ -1472,79 +1472,6 @@ function RenameQuiz(quizId, inFolderId) {
   });
 }
 
-// create dummy quiz item creation on firestore
-document.getElementById("dummyBtn").onclick = async () => {
-  if (currentLocation == "Root") {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const userRef = doc(db, "users", user.uid);
-          const quizzesRef = collection(userRef, "quizzes");
-
-          const date = new Date();
-
-          await addDoc(quizzesRef, {
-            quizName: "quiz item dummy",
-            quizCreatedDate: `${(date.getMonth() + 1)
-              .toString()
-              .padStart(2, "0")}/${date
-              .getDate()
-              .toString()
-              .padStart(2, "0")}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
-            quizCreatedTime: `${date.getHours()}:${date
-              .getMinutes()
-              .toString()
-              .padStart(2, "0")}:${date
-              .getSeconds()
-              .toString()
-              .padStart(2, "0")}`, // Format as HH:MM:SS
-          });
-          location.reload();
-        } catch (error) {
-          console.error("Error adding quiz: ", error.message);
-          console.error("Error adding quiz: ", error);
-          alert("Failed to create quiz.");
-        }
-      }
-    });
-  } else {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const userDocRef = doc(db, "users", user.uid);
-          const quizzesRef = collection(userDocRef, "folders");
-          const folderRef = doc(quizzesRef, currentLocationOnId);
-          const folderQuizzesRef = collection(folderRef, "quizzes");
-
-          const date = new Date();
-
-          await addDoc(folderQuizzesRef, {
-            quizName: "quiz item dummy",
-            quizCreatedDate: `${(date.getMonth() + 1)
-              .toString()
-              .padStart(2, "0")}/${date
-              .getDate()
-              .toString()
-              .padStart(2, "0")}/${date.getFullYear().toString().slice(-2)}`, // Format as MM/DD/YY
-            quizCreatedTime: `${date.getHours()}:${date
-              .getMinutes()
-              .toString()
-              .padStart(2, "0")}:${date
-              .getSeconds()
-              .toString()
-              .padStart(2, "0")}`, // Format as HH:MM:SS
-          });
-          fetchQuizOnFolder();
-        } catch (error) {
-          console.error("Error adding quiz: ", error.message);
-          console.error("Error adding quiz: ", error);
-          alert("Failed to create quiz.");
-        }
-      }
-    });
-  }
-};
-
 // Function to get a unique folder name based on user input
 async function getUniqueFolderName(baseName) {
   const userRef = doc(db, "users", auth.currentUser.uid);
@@ -1988,6 +1915,10 @@ function handleClickOnItem(event) {
             if (docSnap.exists()) {
               const docData = docSnap.data();
               displayQuestions(docData.questions);
+
+              // Remove save button
+              const saveButton = document.getElementById("saveBtn");
+              saveButton.remove();
             }
           }
           // folder
@@ -2001,6 +1932,10 @@ function handleClickOnItem(event) {
             if (docSnap.exists()) {
               const docData = docSnap.data();
               displayQuestions(docData.questions);
+
+              // Remove save button
+              const saveButton = document.getElementById("saveBtn");
+              saveButton.remove();
             }
           }
         } catch (error) {}
@@ -2012,15 +1947,15 @@ function handleClickOnItem(event) {
 }
 itemContainer.addEventListener("click", handleClickOnItem);
 function closeWindow() {
-  const windowElement = document.querySelector('.window');
+  const windowElement = document.querySelector(".window");
   if (windowElement) {
-    windowElement.classList.remove('active');
+    windowElement.classList.remove("active");
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const closeButtons = document.querySelectorAll('.close-button');
-  closeButtons.forEach(button => {
-    button.addEventListener('click', closeWindow);
+document.addEventListener("DOMContentLoaded", () => {
+  const closeButtons = document.querySelectorAll(".close-button");
+  closeButtons.forEach((button) => {
+    button.addEventListener("click", closeWindow);
   });
 });

@@ -136,77 +136,81 @@ async function calculateScores(questions) {
   }
 
   const radioButtons = document.querySelectorAll('input[type="radio"]');
-  radioButtons.forEach(radio => radio.disabled = true);
+  radioButtons.forEach((radio) => (radio.disabled = true));
 
   questions.forEach((question, index) => {
     const selectedOption = document.querySelector(
       `input[name="question${index}"]:checked`
     );
-    
+
     const feedbackContainer = document.querySelector(
-      `.questions-container .question-card:nth-child(${index + 1}) .feedback-container`
+      `.questions-container .question-card:nth-child(${
+        index + 1
+      }) .feedback-container`
     );
-    
-    feedbackContainer.style.display = 'block';
-    const feedbackText = feedbackContainer.querySelector('.feedback-text');
+
+    feedbackContainer.style.display = "block";
+    const feedbackText = feedbackContainer.querySelector(".feedback-text");
 
     if (selectedOption) {
       scores[index] = {
         selectedAnswer: selectedOption.value,
-        isCorrect: selectedOption.value === question.answer
+        isCorrect: selectedOption.value === question.answer,
       };
 
       if (selectedOption.value === question.answer) {
         score++;
         feedbackText.innerHTML = ` 
           <span style="color: green;">Correct! ✓</span> 
-          The answer is: ${selectedOption.getAttribute('data-option')}
+          The answer is: ${selectedOption.getAttribute("data-option")}
         `;
-        feedbackContainer.style.backgroundColor = 'rgba(0, 255, 0, 0.1)';
+        feedbackContainer.style.backgroundColor = "rgba(0, 255, 0, 0.1)";
       } else {
         const correctOption = document.querySelector(
           `input[name="question${index}"][value="${question.answer}"]`
         );
-        
+
         feedbackText.innerHTML = ` 
           <span style="color: red;">Incorrect ✗</span> 
-          Your answer: ${selectedOption.getAttribute('data-option')}
-          <br>Correct answer: ${correctOption.getAttribute('data-option')}
+          Your answer: ${selectedOption.getAttribute("data-option")}
+          <br>Correct answer: ${correctOption.getAttribute("data-option")}
         `;
-        feedbackContainer.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+        feedbackContainer.style.backgroundColor = "rgba(255, 0, 0, 0.1)";
       }
     } else {
       feedbackText.innerHTML = ` 
         <span style="color: orange;">No answer selected</span>
-        Correct answer: ${document.querySelector(
-          `input[name="question${index}"][value="${question.answer}"]`
-        ).getAttribute('data-option')}
+        Correct answer: ${document
+          .querySelector(
+            `input[name="question${index}"][value="${question.answer}"]`
+          )
+          .getAttribute("data-option")}
       `;
-      feedbackContainer.style.backgroundColor = 'rgba(255,165,0,0.1)';
-      
+      feedbackContainer.style.backgroundColor = "rgba(255,165,0,0.1)";
+
       scores[index] = {
         selectedAnswer: null,
-        isCorrect: false
+        isCorrect: false,
       };
     }
   });
 
   alert(`Your score: ${score} out of ${questions.length}`);
 
-  document.getElementById('submitBtn').style.display = 'none';
-  document.getElementById('saveBtn').style.display = 'none';
+  document.getElementById("submitBtn").style.display = "none";
+  document.getElementById("saveBtn").style.display = "none";
 
-  const buttonContainer = document.querySelector('.button-container');
-  
-  const takeAgainButton = document.createElement('button');
-  takeAgainButton.textContent = 'Take Quiz Again';
-  takeAgainButton.className = 'primary-button';
-  takeAgainButton.addEventListener('click', () => window.location.reload());
+  const buttonContainer = document.querySelector(".button-container");
 
-  const saveButton = document.createElement('button');
-  saveButton.textContent = 'Save Quiz';
-  saveButton.className = 'secondary-button';
-  saveButton.addEventListener('click', () => promptAndSaveQuiz(questions));
+  const takeAgainButton = document.createElement("button");
+  takeAgainButton.textContent = "Take Quiz Again";
+  takeAgainButton.className = "primary-button";
+  takeAgainButton.addEventListener("click", () => window.location.reload());
+
+  const saveButton = document.createElement("button");
+  saveButton.textContent = "Save Quiz";
+  saveButton.className = "secondary-button";
+  saveButton.addEventListener("click", () => promptAndSaveQuiz(questions));
 
   buttonContainer.appendChild(takeAgainButton);
   buttonContainer.appendChild(saveButton);
@@ -229,7 +233,7 @@ async function calculateScores(questions) {
         question: q.question,
         options: q.options,
         correctAnswer: q.answer,
-        userAnswer: scores[index]
+        userAnswer: scores[index],
       })),
     };
 
@@ -250,12 +254,13 @@ async function promptAndSaveQuiz(questions) {
   if (quizName) {
     try {
       const isUnique = await checkQuizNameUniqueness(quizName);
-      
+
       if (isUnique) {
         await saveQuiz(quizName, questions);
         alert("Quiz saved successfully!");
 
-        window.location.href = "http://127.0.0.1:5500/BSCS3A-InstaQuiz/InstaQuiz/html/sidebars/sd_quizzes.html";
+        window.location.href =
+          "../../../../InstaQuiz/html/sidebars/sd_quizzes.html";
       } else {
         alert("Quiz name is already taken. Please choose another name.");
       }
