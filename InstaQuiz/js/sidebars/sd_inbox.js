@@ -5,6 +5,7 @@ import {
   getDoc,
   getDocs,
   doc,
+  deleteDoc,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import {
   getAuth,
@@ -28,10 +29,11 @@ const auth = getAuth(app);
 
 const fetchSharedQuizzes = async (userId) => {
   try {
-    const sharedRef = collection(db, `users/${userId}/shared`);
+    const sharedRef = collection(db, "users", userId, "shared");
     const querySnapshot = await getDocs(sharedRef);
 
     const container = document.getElementById("shared-quizzes-container");
+
     container.innerHTML = "";
 
     if (querySnapshot.empty) {
@@ -81,9 +83,14 @@ window.viewQuiz = (quizId) => {
 const shareQuizzesContainer = document.getElementById(
   "shared-quizzes-container"
 );
+
+// Shared quiz id
+let sharedQuizId;
+
 shareQuizzesContainer.addEventListener("click", HandleClick);
 async function HandleClick(event) {
   const elementId = event.target.id;
+  sharedQuizId = elementId;
 
   if (elementId !== "shared-quizzes-container") {
     // Gets the data and pass the details
@@ -128,9 +135,55 @@ async function HandleClick(event) {
   }
 }
 
-// Handleclick for details
-const shareQuizzesDetailsContainer = document.getElementById(
-  "shared-quizzes-details-container"
-);
-shareQuizzesDetailsContainer.addEventListener("click", HandleClick);
-async function HandleClickDetails(event) {}
+document.getElementById("accept-btn").onclick = function () {
+  // Gets the data and pass the details
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const sharedQuizRef = doc(
+          db,
+          "users",
+          user.uid,
+          "shared",
+          sharedQuizId
+        );
+
+        const quizNameSnapshot = await getDoc(sharedQuizRef);
+      } catch (error) {
+        console.error("Error fetching shared quiz data:", error);
+      }
+    }
+  });
+};
+
+document.getElementById("decline-btn").onclick = function () {
+  // Gets the data and pass the details
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const sharedQuizRef = doc(
+          db,
+          "users",
+          user.uid,
+          "shared",
+          sharedQuizId
+        );
+        await deleteDoc(sharedQuizRef);
+
+        const clickedChild = document.getElementById(sharedQuizId);
+        const container = document.getElementById("shared-quizzes-container");
+        container.removeChild(clickedChild);
+
+        // Shows the container
+        const shareQuizzesContainer = document.getElementById(
+          "shared-quizzes-details-container"
+        );
+        shareQuizzesContainer.style.display = "none";
+
+        clearContainer();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  });
+};

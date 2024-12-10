@@ -267,23 +267,27 @@ h1 {
 #quizName {
     margin-top: 0px;
     margin-bottom: 30px;
+    pointer-events: none;
 }
 
 #subject {
     font-weight: bold;
     font-size:larger;
     margin-bottom: 0px;
+    pointer-events: none;
 }
 
 #from {
     margin-top: 10px;
     margin-bottom: 25px;
+    pointer-events: none;
 }
 
 #noteLabel {
     pointer-events: none;
     font-weight: bold;
     margin-bottom: 10px;
+    pointer-events: none;
 }
 
 .buttonContainer {
