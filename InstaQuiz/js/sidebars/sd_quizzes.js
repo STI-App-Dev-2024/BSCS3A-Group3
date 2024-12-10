@@ -933,16 +933,6 @@ async function ShareQuiz(quizId, inFolder, inFolderId) {
   const shareBtn = document.getElementById("shareQuizBtn");
 
   shareBtn.onclick = async function () {
-    // closes the modal
-    var modal = document.getElementById("myShareQuizModal");
-    modal.style.opacity = "0";
-    modal.classList.remove("show");
-    modal.classList.add("hide");
-
-    setTimeout(() => {
-      modal.style.display = "none";
-    }, 300);
-
     var shareQuizInput = document.getElementById("shareQuizInput").value;
     shareQuizInput = shareQuizInput.trim();
 
@@ -979,6 +969,17 @@ async function ShareQuiz(quizId, inFolder, inFolderId) {
               const firstName = docSnapSender.data().firstName;
               const lastName = docSnapSender.data().lastName;
 
+              // gets the subject
+              var shareQuizInputSubject = document.getElementById(
+                "shareQuizInputSubject"
+              ).value;
+
+              // Check if the input is blank (empty or contains only whitespace)
+              if (!shareQuizInputSubject.trim()) {
+                alert("Subject field is required!");
+                return null;
+              }
+
               // gets the message
               var shareQuizInputMessage = document.getElementById(
                 "shareQuizInputMessage"
@@ -990,6 +991,7 @@ async function ShareQuiz(quizId, inFolder, inFolderId) {
               }
 
               docData.sharedDetails.push({
+                subject: shareQuizInputSubject,
                 message: shareQuizInputMessage,
                 senderFirstName: firstName,
                 senderLastName: lastName,
@@ -998,6 +1000,13 @@ async function ShareQuiz(quizId, inFolder, inFolderId) {
               // target location (paste)
               const sharedRef = collection(db, "users", userTargetId, "shared");
               await addDoc(sharedRef, docData, { merge: true });
+
+              var input1 = document.getElementById("shareQuizInput");
+              var input2 = document.getElementById("shareQuizInputSubject");
+              var input3 = document.getElementById("shareQuizInputMessage");
+              input1.value = "";
+              input2.value = "";
+              input3.value = "";
             }
 
             // In the root
@@ -1016,6 +1025,17 @@ async function ShareQuiz(quizId, inFolder, inFolderId) {
               const firstName = docSnapSender.data().firstName;
               const lastName = docSnapSender.data().lastName;
 
+              // gets the subject
+              var shareQuizInputSubject = document.getElementById(
+                "shareQuizInputSubject"
+              ).value;
+
+              // Check if the input is blank (empty or contains only whitespace)
+              if (!shareQuizInputSubject.trim()) {
+                alert("Subject field is required!");
+                return null;
+              }
+
               // gets the message
               var shareQuizInputMessage = document.getElementById(
                 "shareQuizInputMessage"
@@ -1027,6 +1047,7 @@ async function ShareQuiz(quizId, inFolder, inFolderId) {
               }
 
               docData.sharedDetails.push({
+                subject: shareQuizInputSubject,
                 message: shareQuizInputMessage,
                 senderFirstName: firstName,
                 senderLastName: lastName,
@@ -1035,6 +1056,13 @@ async function ShareQuiz(quizId, inFolder, inFolderId) {
               // target location (paste)
               const sharedRef = collection(db, "users", userTargetId, "shared");
               await addDoc(sharedRef, docData, { merge: true });
+
+              var input1 = document.getElementById("shareQuizInput");
+              var input2 = document.getElementById("shareQuizInputSubject");
+              var input3 = document.getElementById("shareQuizInputMessage");
+              input1.value = "";
+              input2.value = "";
+              input3.value = "";
             } else {
               console.log("error");
             }
@@ -1051,6 +1079,15 @@ async function ShareQuiz(quizId, inFolder, inFolderId) {
         }
       }
     });
+    // closes the modal
+    var modal = document.getElementById("myShareQuizModal");
+    modal.style.opacity = "0";
+    modal.classList.remove("show");
+    modal.classList.add("hide");
+
+    setTimeout(() => {
+      modal.style.display = "none";
+    }, 300);
   };
 }
 
@@ -1874,6 +1911,7 @@ const fetchQuizOnFolder = async () => {
 
 // Function to handle click events on folder
 const folderContainer = document.getElementById("folderContainer");
+folderContainer.addEventListener("click", handleClickOnFolder);
 function handleClickOnFolder(event) {
   const elementId = event.target.id;
   const folderName = event.target.textContent;
@@ -1893,11 +1931,11 @@ function handleClickOnFolder(event) {
     // do nothing
   }
 }
-folderContainer.addEventListener("click", handleClickOnFolder);
 
 // Function to handle click events on quiz
 import { displayQuestions } from "../convert_function/convertPDF.js";
 const itemContainer = document.getElementById("itemContainer");
+itemContainer.addEventListener("click", handleClickOnItem);
 function handleClickOnItem(event) {
   const elementId = event.target.id;
 
@@ -1945,7 +1983,7 @@ function handleClickOnItem(event) {
     // do nothing
   }
 }
-itemContainer.addEventListener("click", handleClickOnItem);
+
 function closeWindow() {
   const windowElement = document.querySelector(".window");
   if (windowElement) {

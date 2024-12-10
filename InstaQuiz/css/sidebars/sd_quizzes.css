@@ -156,10 +156,6 @@ h2 {
     align-items: center;
 }
 
-
-
-
-
 .ffcontainer {
     width: 100%;
     margin: 0 auto;
@@ -399,6 +395,7 @@ h2 {
     border-radius: 8px;
     text-align: left;
     margin-right: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 .cancel-btn:hover {
     background-color: #dd3a3a;
@@ -414,10 +411,11 @@ h2 {
     border: 2px solid #4caf50;
     cursor: pointer;
     border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 .create-folder-btn:hover {
-    background-color: #6bc06c;
-    border: 2px solid #6bc06c;
+    background-color: #3c913f;
+    border: 2px solid #3c913f;
 }
 
 
@@ -485,6 +483,7 @@ h2 {
     border-radius: 8px;
     text-align: left;
     margin-right: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 .rename-cancel-btn:hover {
     background-color: #dd3a3a;
@@ -499,10 +498,11 @@ h2 {
     border: 2px solid #4caf50;
     cursor: pointer;
     border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 .rename-folder-btn:hover {
-    background-color: #6bc06c;
-    border: 2px solid #6bc06c;
+    background-color: #3c913f;
+    border: 2px solid #3c913f;
 }
 
 .renameFolderModal.show {
@@ -577,6 +577,7 @@ h2 {
     border-radius: 8px;
     text-align: left;
     margin-right: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 .rename-quiz-cancel-btn:hover {
     background-color: #dd3a3a;
@@ -591,10 +592,11 @@ h2 {
     border: 2px solid #4caf50;
     cursor: pointer;
     border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 .rename-quiz-btn:hover {
-    background-color: #6bc06c;
-    border: 2px solid #6bc06c;
+    background-color: #3c913f;
+    border: 2px solid #3c913f;
 }
 
 /* Copy Quiz Modal */
@@ -618,9 +620,9 @@ h2 {
     border: 1px solid #888;
     width: auto;
     height: auto;
-    margin-bottom: 5%;
+    margin-bottom: 4%;
     border-radius: 8px;
-    box-shadow: 0 0px 12px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Copy Quiz Buttons container */
@@ -644,7 +646,7 @@ h2 {
 }
 
 .copy-quiz-btn:hover {
-    background-color: #45a049;
+    background-color: #3c913f;
 }
 
 .copyQuizModal.show {
@@ -667,6 +669,7 @@ h2 {
     text-align: left;
     margin-left: 5px;
     margin-right: 25px;
+    transition: background-color 0.3s ease;
 }
 
 .copy-quiz-cancel-btn:hover {
@@ -713,6 +716,16 @@ h2 {
 
 /* Share Quiz input */
 #shareQuizInput {
+    display: block;
+    font-size: 100%;
+    padding: 13px;
+    margin-top: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Share Quiz input subject */
+#shareQuizInputSubject {
     display: block;
     font-size: 100%;
     padding: 13px;
@@ -1091,39 +1104,3 @@ body {
   .secondary-button:hover {
     background-color: #c6f6d5; /* Light green on hover */
   }
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

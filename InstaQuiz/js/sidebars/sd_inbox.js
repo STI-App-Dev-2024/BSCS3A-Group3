@@ -2,7 +2,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebas
 import {
   getFirestore,
   collection,
+  getDoc,
   getDocs,
+  doc,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import {
   getAuth,
@@ -40,16 +42,21 @@ const fetchSharedQuizzes = async (userId) => {
 
         const quizElement = document.createElement("div");
         quizElement.classList.add("quiz-item");
+        quizElement.id = doc.id;
         quizElement.innerHTML = `
-                <h2>${quiz.quizName}</h2>
-                <p><strong>From:</strong> ${
-                  quiz.sharedDetails[0]?.senderFirstName || "Unknown"
-                } ${quiz.sharedDetails[0]?.senderLastName || ""}</p>
-                <p><strong>Message:</strong> ${
-                  quiz.sharedDetails[0]?.message || "No message provided"
-                }</p>
+          </p><strong style="font-size: 1.1em">
+           ${
+             quiz.sharedDetails[0]?.subject
+               ? quiz.sharedDetails[0].subject.length > 50
+                 ? quiz.sharedDetails[0].subject.substring(0, 50) + "..."
+                 : quiz.sharedDetails[0].subject
+               : "No message provided"
+           }</strong></p>
 
-                `;
+          <p style="font-size: 0.96em"><strong>From:</strong> ${
+            quiz.sharedDetails[0]?.senderFirstName || "Unknown"
+          } ${quiz.sharedDetails[0]?.senderLastName || ""}
+        `;
         container.appendChild(quizElement);
       });
     }
@@ -69,3 +76,61 @@ onAuthStateChanged(auth, (user) => {
 window.viewQuiz = (quizId) => {
   window.location.href = `../quizzes/quiz.html?id=${quizId}`;
 };
+
+// Handleclick for shared quizzes
+const shareQuizzesContainer = document.getElementById(
+  "shared-quizzes-container"
+);
+shareQuizzesContainer.addEventListener("click", HandleClick);
+async function HandleClick(event) {
+  const elementId = event.target.id;
+
+  if (elementId !== "shared-quizzes-container") {
+    // Gets the data and pass the details
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const sharedQuizRef = doc(db, "users", user.uid, "shared", elementId);
+          const quizNameSnapshot = await getDoc(sharedQuizRef);
+
+          // Gets the shared details
+          const quizName = quizNameSnapshot.data().quizName;
+          const subject = quizNameSnapshot.data().sharedDetails[0].subject;
+          const from = quizNameSnapshot.data().sharedDetails[0].from;
+          const senderFirstName =
+            quizNameSnapshot.data().sharedDetails[0].senderFirstName;
+          const senderLastName =
+            quizNameSnapshot.data().sharedDetails[0].senderLastName;
+          const message = quizNameSnapshot.data().sharedDetails[0].message;
+
+          const QuizName = document.getElementById("quizName");
+          const Subject = document.getElementById("subject");
+          const From = document.getElementById("from");
+          const Message = document.getElementById("message");
+
+          QuizName.textContent = quizName;
+          Subject.textContent = subject;
+          From.textContent = "from: " + senderFirstName + " " + senderLastName;
+          Message.textContent = message;
+
+          // Shows the container
+          const shareQuizzesContainer = document.getElementById(
+            "shared-quizzes-details-container"
+          );
+          shareQuizzesContainer.style.display = "flex";
+        } catch (error) {
+          console.error(error.message);
+        }
+      }
+    });
+  } else {
+    // do nothing
+  }
+}
+
+// Handleclick for details
+const shareQuizzesDetailsContainer = document.getElementById(
+  "shared-quizzes-details-container"
+);
+shareQuizzesDetailsContainer.addEventListener("click", HandleClick);
+async function HandleClickDetails(event) {}
