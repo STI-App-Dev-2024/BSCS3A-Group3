@@ -13,19 +13,14 @@ from nltk.corpus import wordnet
 app = Flask(__name__)
 CORS(app)
 
-# Load the spaCy model
 nlp = spacy.load("en_core_web_sm")
 
- 
-# Function to find synonyms using WordNet
 def find_similar_words(word):
     synonyms = set()
     for syn in wordnet.synsets(word):
         for lemma in syn.lemmas():
             synonyms.add(lemma.name())
     return list(synonyms)
-
-
 
 def generate_mcq(text, num_questions=5):
     if not text or text.strip() == "":
@@ -36,7 +31,6 @@ def generate_mcq(text, num_questions=5):
     num_questions = min(num_questions, len(sentences))
     selected_sentences = random.sample(sentences, num_questions)
 
-    # List of random names or nouns to use for invalid options
     random_names_or_nouns = ["John", "Alice", "chair", "mountain", "dog", "book", "car", "tree", "planet"]
 
     questions = []
@@ -44,7 +38,6 @@ def generate_mcq(text, num_questions=5):
     for sentence in selected_sentences:
         sent_doc = nlp(sentence)
 
-        # Extract entities or fallback to nouns
         entities = [ent.text for ent in sent_doc.ents if ent.label_ in {"PERSON", "ORG", "GPE", "DATE", "NORP"}]
         if not entities:
             entities = [token.text for token in sent_doc if token.pos_ == "NOUN"]
@@ -56,42 +49,30 @@ def generate_mcq(text, num_questions=5):
         subject = entity_counts.most_common(1)[0][0]
         question_stem = sentence.replace(subject, "______")
 
-        # Generate answer choices
         answer_choices = [subject]
         
-        # Find similar words for distractors
         distractors = find_similar_words(subject)
         
-        # Remove the correct answer from distractors
         distractors = list(set(distractors) - {subject})
         
         if len(distractors) < 3:
-            # If not enough synonyms, add random nouns or names as distractors
             distractors += random.sample(random_names_or_nouns, min(3, len(random_names_or_nouns)))
 
-        # Ensure no overlap with the correct answer
         distractors = [d for d in distractors if d != subject]
 
-        # Filter out overly similar distractors (e.g., "UN" and "The United Nations")
         distractors = [d for d in distractors if not are_similar(d, subject)]
 
-        # Shuffle distractors and add them to the choices
         random.shuffle(distractors)
         
-        # Ensure we have 3 additional distractors, so the total choices are 4
         answer_choices += distractors[:3]
         
-        # Shuffle all answer choices
         random.shuffle(answer_choices)
 
-        # Ensure that no duplicate answers exist in the choices
         answer_choices = list(set(answer_choices))
 
-        # If we don't have 4 choices after filtering, add random names or nouns
         while len(answer_choices) < 4:
             answer_choices.append(random.choice(random_names_or_nouns))
 
-        # Get the correct answer index
         correct_answer = chr(65 + answer_choices.index(subject))
 
         questions.append({
@@ -102,26 +83,9 @@ def generate_mcq(text, num_questions=5):
 
     return questions
 
-
-# Helper function to check if two answers are too similar
 def are_similar(answer1, answer2):
     return answer1.lower() == answer2.lower() or answer1 in answer2 or answer2 in answer1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Function for generating fill-in-the-blank questions
 def generate_fill_in_the_blank(text, num_questions=5):
     if not text or text.strip() == "":
         return []
@@ -154,7 +118,6 @@ def generate_fill_in_the_blank(text, num_questions=5):
 
     return questions
 
-# Function for generating True/False questions
 def generate_true_false(text, num_questions=5):
     if not text or text.strip() == "":
         return []
@@ -167,7 +130,6 @@ def generate_true_false(text, num_questions=5):
     questions = []
 
     for sentence in selected_sentences:
-        # For True/False, generate more contextually diverse questions
         question_stem = f"Is the following statement true or false?\n{sentence}"
         correct_answer = random.choice(["True", "False"])
 
@@ -179,14 +141,11 @@ def generate_true_false(text, num_questions=5):
 
     return questions
 
-# Clean the extracted text to avoid formulas
 def clean_text(text):
-    # Remove common mathematical formulas or any text with 'E=mc^2' pattern
     text = re.sub(r'\bE\s*=\s*mc\^2\b', '', text)
-    text = re.sub(r'[0-9]+[\s]*[a-zA-Z]+[\s]*=[\s]*[a-zA-Z]+[\^][0-9]+', '', text)  # generic formula pattern
+    text = re.sub(r'[0-9]+[\s]*[a-zA-Z]+[\s]*=[\s]*[a-zA-Z]+[\^][0-9]+', '', text)
     return text
 
-# Process PDF and extract text
 def process_pdf(file):
     text = ""
     pdf_reader = PyPDF2.PdfReader(file)
@@ -211,7 +170,6 @@ def convert():
     else:
         text = request.form.get('text', '')
 
-    # Clean the extracted text to avoid formulas
     text = clean_text(text)
 
     if not text.strip():

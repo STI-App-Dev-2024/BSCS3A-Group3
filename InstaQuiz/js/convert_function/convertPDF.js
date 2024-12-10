@@ -127,6 +127,8 @@ export function displayQuestions(questions) {
   saveButton.addEventListener("click", () => promptAndSaveQuiz(questions));
 }
 
+
+
 async function calculateScores(questions) {
   let score = 0;
   const scores = {};
@@ -137,28 +139,42 @@ async function calculateScores(questions) {
     return;
   }
 
-  let quizName = localStorage.getItem("currentQuizTitle");
-  if (!quizName) {
-    quizName = prompt("Enter quiz name:");
-    if (!quizName) {
-      alert("No quiz name entered. Quiz not saved.");
-      return;
+  // Generate quiz name as 'Quiz1', 'Quiz2', etc.
+  let quizName = "Quiz1";
+  try {
+    const quizzesCollection = collection(db, "users", userId, "quizzes");
+    let quizExists = true;
+    let quizNumber = 1;
+
+    while (quizExists) {
+      const quizDoc = await getDocs(
+        query(quizzesCollection, where("quizName", "==", quizName))
+      );
+      if (quizDoc.empty) {
+        quizExists = false;
+      } else {
+        quizNumber++;
+        quizName = `Quiz${quizNumber}`;
+      }
     }
-    localStorage.setItem("currentQuizTitle", quizName);
+  } catch (error) {
+    console.error("Error checking quiz names:", error);
+    alert("Error generating quiz name. Please try again.");
+    return;
   }
 
+  // Disable radio buttons after submission
   const radioButtons = document.querySelectorAll('input[type="radio"]');
   radioButtons.forEach((radio) => (radio.disabled = true));
 
+  // Calculate scores and provide feedback
   questions.forEach((question, index) => {
     const selectedOption = document.querySelector(
       `input[name="question${index}"]:checked`
     );
 
     const feedbackContainer = document.querySelector(
-      `.questions-container .question-card:nth-child(${
-        index + 1
-      }) .feedback-container`
+      `.questions-container .question-card:nth-child(${index + 1}) .feedback-container`
     );
 
     feedbackContainer.style.display = "block";
@@ -172,7 +188,7 @@ async function calculateScores(questions) {
 
       if (selectedOption.value === question.answer) {
         score++;
-        feedbackText.innerHTML = ` 
+        feedbackText.innerHTML = `
           <span style="color: green;">Correct! ✓</span> 
           The answer is: ${selectedOption.getAttribute("data-option")}
         `;
@@ -182,7 +198,7 @@ async function calculateScores(questions) {
           `input[name="question${index}"][value="${question.answer}"]`
         );
 
-        feedbackText.innerHTML = ` 
+        feedbackText.innerHTML = `
           <span style="color: red;">Incorrect ✗</span> 
           Your answer: ${selectedOption.getAttribute("data-option")}
           <br>Correct answer: ${correctOption.getAttribute("data-option")}
@@ -190,7 +206,7 @@ async function calculateScores(questions) {
         feedbackContainer.style.backgroundColor = "rgba(255, 0, 0, 0.1)";
       }
     } else {
-      feedbackText.innerHTML = ` 
+      feedbackText.innerHTML = `
         <span style="color: orange;">No answer selected</span>
         Correct answer: ${document
           .querySelector(
@@ -219,21 +235,11 @@ async function calculateScores(questions) {
   takeAgainButton.className = "primary-button";
   takeAgainButton.addEventListener("click", () => window.location.reload());
 
-  const saveButton = document.createElement("button");
-  saveButton.textContent = "Save Quiz";
-  saveButton.className = "secondary-button";
-  saveButton.addEventListener("click", () => promptAndSaveQuiz(questions));
-
   buttonContainer.appendChild(takeAgainButton);
-  buttonContainer.appendChild(saveButton);
 
+  // Save quiz details to Firestore
   try {
     const quizzesCollection = collection(db, "users", userId, "quizzes");
-    const quizQuery = query(
-      quizzesCollection,
-      where("questions", "==", JSON.stringify(questions))
-    );
-    const existingQuizSnapshot = await getDocs(quizQuery);
 
     const quizData = {
       quizName,
@@ -245,21 +251,20 @@ async function calculateScores(questions) {
         question: q.question,
         options: q.options,
         correctAnswer: q.answer,
-        userAnswer: scores[index],
+        userAnswer: scores[index]?.selectedAnswer || null,
       })),
     };
 
-    if (!existingQuizSnapshot.empty) {
-      const quizDocRef = existingQuizSnapshot.docs[0].ref;
-      await updateDoc(quizDocRef, quizData);
-    } else {
-      await addDoc(quizzesCollection, quizData);
-    }
+    await addDoc(quizzesCollection, quizData);
+    alert(`Quiz "${quizName}" saved successfully.`);
+   // Redirect to the specified URL
+   window.location.href = "http://127.0.0.1:5500/BSCS3A-InstaQuiz/InstaQuiz/html/sidebars/sd_quizzes.html";
   } catch (error) {
     console.error("Error saving quiz details:", error);
     alert("Error saving quiz details. Please try again.");
   }
 }
+
 
 async function promptAndSaveQuiz(questions) {
   const quizName = prompt("Enter quiz name to save quiz:");
