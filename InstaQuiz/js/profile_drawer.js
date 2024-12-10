@@ -59,7 +59,7 @@ onAuthStateChanged(auth, async (user) => {
       console.error("No such document in Firestore!");
     }
   } else {
-    window.location.href = "signin.html";
+    window.location.href = "../signin.html";
   }
 });
 
@@ -701,4 +701,3 @@ document.querySelector(".logout").addEventListener("click", function (event) {
       });
   }
 });
-
