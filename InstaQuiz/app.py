@@ -4,6 +4,10 @@ import spacy
 from collections import Counter
 import random
 import PyPDF2
+import nltk
+
+nltk.download('wordnet')
+from nltk.corpus import wordnet
 
 app = Flask(__name__)
 CORS(app)
@@ -11,13 +15,20 @@ CORS(app)
 # Load the spaCy model
 nlp = spacy.load("en_core_web_sm")
 
+# Function to find synonyms using WordNet
+def find_similar_words(word):
+    synonyms = []
+    for syn in wordnet.synsets(word):
+        for lemma in syn.lemmas():
+            synonyms.append(lemma.name())
+    return list(set(synonyms))
+
 # Function for generating MCQs
 def generate_mcq(text, num_questions=5):
     if not text or text.strip() == "":
         return []
 
     doc = nlp(text)
-
     sentences = [sent.text for sent in doc.sents if len(sent.text.split()) > 3]
     num_questions = min(num_questions, len(sentences))
     selected_sentences = random.sample(sentences, num_questions)
@@ -27,24 +38,22 @@ def generate_mcq(text, num_questions=5):
     for sentence in selected_sentences:
         sent_doc = nlp(sentence)
 
-        # Extract entities
+        # Extract entities or fallback to nouns
         entities = [ent.text for ent in sent_doc.ents if ent.label_ in {"PERSON", "ORG", "GPE", "DATE", "NORP"}]
-        
-        # Fallback to nouns if no entities are found
         if not entities:
             entities = [token.text for token in sent_doc if token.pos_ == "NOUN"]
 
         if len(entities) < 1:
             continue
 
-        # Find the most common subject to use for the question
         entity_counts = Counter(entities)
         subject = entity_counts.most_common(1)[0][0]
         question_stem = sentence.replace(subject, "______")
 
         # Generate answer choices
         answer_choices = [subject]
-        distractors = list(set(entities) - {subject})
+        distractors = find_similar_words(subject)
+        distractors = list(set(distractors) - {subject})
         if len(distractors) < 3:
             distractors += random.sample(entities, min(3, len(entities)))
 
@@ -62,13 +71,12 @@ def generate_mcq(text, num_questions=5):
 
     return questions
 
-# Function for generating Fill-in-the-Blank questions
+# Function for generating fill-in-the-blank questions
 def generate_fill_in_the_blank(text, num_questions=5):
     if not text or text.strip() == "":
         return []
 
     doc = nlp(text)
-
     sentences = [sent.text for sent in doc.sents if len(sent.text.split()) > 3]
     num_questions = min(num_questions, len(sentences))
     selected_sentences = random.sample(sentences, num_questions)
@@ -78,18 +86,15 @@ def generate_fill_in_the_blank(text, num_questions=5):
     for sentence in selected_sentences:
         sent_doc = nlp(sentence)
 
-        # Extract entities
         entities = [ent.text for ent in sent_doc.ents if ent.label_ in {"PERSON", "ORG", "GPE", "DATE", "NORP"}]
-
-        # Fallback to nouns if no entities are found
         if not entities:
             entities = [token.text for token in sent_doc if token.pos_ == "NOUN"]
 
         if len(entities) < 1:
             continue
 
-        # Replace a noun or entity with a blank space
-        subject = entities[0]
+        entity_counts = Counter(entities)
+        subject = entity_counts.most_common(1)[0][0]
         question_stem = sentence.replace(subject, "______")
 
         questions.append({
@@ -105,7 +110,6 @@ def generate_true_false(text, num_questions=5):
         return []
 
     doc = nlp(text)
-
     sentences = [sent.text for sent in doc.sents if len(sent.text.split()) > 3]
     num_questions = min(num_questions, len(sentences))
     selected_sentences = random.sample(sentences, num_questions)
@@ -113,7 +117,6 @@ def generate_true_false(text, num_questions=5):
     questions = []
 
     for sentence in selected_sentences:
-        # For True/False, simply ask whether the sentence is factually correct
         question_stem = "Is the following statement true or false?\n" + sentence
         correct_answer = random.choice(["True", "False"])
 
@@ -170,8 +173,8 @@ def submit_quiz():
 
     for key, selected_answer in scores.items():
         if key.isdigit() and int(key) < len(questions):
-            correct_answer = questions[int(key)]['answer']   
-            if selected_answer == correct_answer:   
+            correct_answer = questions[int(key)]['answer']
+            if selected_answer == correct_answer:
                 correct_count += 1
 
     return jsonify({'score': correct_count})
