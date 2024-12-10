@@ -197,3 +197,28 @@ h1 {
 .profile-drawer a:hover {
     background-color: #f0f0f0;
 }
+
+.quiz-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    margin-bottom: 8px;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    border: 1px solid #aaaaaa;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    width: 35%;
+    height: auto;
+}
+
+.quiz-item h2, 
+.quiz-item p {
+    margin: 5px 0; /* Adjust margin to reduce spacing */
+}
+
+.quiz-item:hover {
+    background-color: #c2e4c7;
+}
+
