@@ -23,9 +23,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+
+
+
 document.querySelector(".convert-btn").addEventListener("click", async () => {
   const questionCount = document.getElementById("questionCount").value;
   const fileInput = document.getElementById("fileInput");
+
+  // Get the selected question type (multipleChoice, fillInTheBlanks, trueFalse)
+  const questionType = document.querySelector('input[name="questionType"]:checked').value;
 
   if (fileInput.files.length === 0) {
     alert("Please upload a file before converting.");
@@ -37,6 +43,7 @@ document.querySelector(".convert-btn").addEventListener("click", async () => {
   const formData = new FormData();
   formData.append("files[]", file);
   formData.append("questionCount", questionCount);
+  formData.append("questionType", questionType);  // Append the question type
 
   try {
     const response = await fetch("http://127.0.0.1:5000/convert", {
@@ -59,6 +66,11 @@ document.querySelector(".convert-btn").addEventListener("click", async () => {
     alert("Error fetching questions. Please try again.");
   }
 });
+
+
+
+
+
 
 export function displayQuestions(questions) {
   const content = document.querySelector(".content");
