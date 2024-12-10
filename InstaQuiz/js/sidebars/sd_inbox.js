@@ -6,6 +6,8 @@ import {
   getDocs,
   doc,
   deleteDoc,
+  addDoc,
+  setDoc,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import {
   getAuth,
@@ -109,11 +111,23 @@ async function HandleClick(event) {
           const senderLastName =
             quizNameSnapshot.data().sharedDetails[0].senderLastName;
           const message = quizNameSnapshot.data().sharedDetails[0].message;
+          const status = quizNameSnapshot.data().sharedDetails[0].status;
 
           const QuizName = document.getElementById("quizName");
           const Subject = document.getElementById("subject");
           const From = document.getElementById("from");
           const Message = document.getElementById("message");
+
+          if (status == "accepted") {
+            document.querySelector(".buttonContainer").style.display = "none";
+            document.querySelector(".buttonContainer2").style.display = "flex";
+          } else if (status == "declined") {
+            const buttonContainer = document.getElementById("buttonContainer");
+            buttonContainer.style.display = "none";
+          } else {
+            document.querySelector(".buttonContainer").style.display = "flex";
+            document.querySelector(".buttonContainer2").style.display = "none";
+          }
 
           QuizName.textContent = quizName;
           Subject.textContent = subject;
@@ -147,8 +161,17 @@ document.getElementById("accept-btn").onclick = function () {
           "shared",
           sharedQuizId
         );
+        const sharedQuizSnapshot = await getDoc(sharedQuizRef);
+        const quizData = sharedQuizSnapshot.data();
+        const rootUserRef = collection(db, "users", user.uid, "quizzes");
+        await addDoc(rootUserRef, quizData);
 
-        const quizNameSnapshot = await getDoc(sharedQuizRef);
+        quizData.sharedDetails[0].status = "accepted";
+
+        await setDoc(sharedQuizRef, quizData, { merge: true });
+
+        document.querySelector(".buttonContainer").style.display = "none";
+        document.querySelector(".buttonContainer2").style.display = "flex";
       } catch (error) {
         console.error("Error fetching shared quiz data:", error);
       }
@@ -157,7 +180,27 @@ document.getElementById("accept-btn").onclick = function () {
 };
 
 document.getElementById("decline-btn").onclick = function () {
-  // Gets the data and pass the details
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const sharedQuizRef = doc(
+          db,
+          "users",
+          user.uid,
+          "shared",
+          sharedQuizId
+        );
+
+        const status = { status: "declined " };
+        await setDoc(sharedQuizRef, status, { merge: true });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  });
+};
+
+document.getElementById("delete-btn").onclick = function () {
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       try {
@@ -170,17 +213,16 @@ document.getElementById("decline-btn").onclick = function () {
         );
         await deleteDoc(sharedQuizRef);
 
+        // deletes locally
         const clickedChild = document.getElementById(sharedQuizId);
         const container = document.getElementById("shared-quizzes-container");
         container.removeChild(clickedChild);
 
-        // Shows the container
+        // Hides the container
         const shareQuizzesContainer = document.getElementById(
           "shared-quizzes-details-container"
         );
         shareQuizzesContainer.style.display = "none";
-
-        clearContainer();
       } catch (error) {
         console.error(error);
       }

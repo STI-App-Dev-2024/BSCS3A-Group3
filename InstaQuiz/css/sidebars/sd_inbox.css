@@ -254,10 +254,11 @@ h1 {
     border: 1px solid #aaaaaa;
     margin: 2%;
     box-shadow: 0 0px 8px rgba(0, 0, 0, 0.2);
-    padding: 40px;
+    padding: 5%;
     width: auto;
     height: auto;
     transition: box-shadow 0.3s ease;
+    min-width: 50%;
 }
 
 #shared-quizzes-details-container2:hover {
@@ -266,7 +267,7 @@ h1 {
 
 #quizName {
     margin-top: 0px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     pointer-events: none;
 }
 
@@ -278,7 +279,7 @@ h1 {
 }
 
 #from {
-    margin-top: 10px;
+    margin-top: 8px;
     margin-bottom: 25px;
     pointer-events: none;
 }
@@ -286,25 +287,27 @@ h1 {
 #noteLabel {
     pointer-events: none;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     pointer-events: none;
 }
 
 .buttonContainer {
     display: flex;
     margin-top: 10%;
+    gap: 10px;
     align-items: center;
     justify-content: center;
 }
 
 #decline-btn {
-    padding: 12px 25px;
+    padding: 12px 28px;
     background-color: white;
     color: #dd3a3a;
     border: 2px solid #dd3a3a;
     cursor: pointer;
     border-radius: 8px;
-    text-align: left;
+    text-align: center;
+    font-weight: bold;
     margin-right: 10px;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
@@ -314,11 +317,13 @@ h1 {
 }
 
 #accept-btn {
-    padding: 12px 25px;
+    padding: 12px 30px;
     background-color: #4caf50;
     color: #fff;
     border: 2px solid #4caf50;
     cursor: pointer;
+    text-align: center;
+    font-weight: bold;
     border-radius: 8px;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
@@ -327,3 +332,39 @@ h1 {
     border: 2px solid #3c913f;
 }
 
+
+.buttonContainer2 {
+    display: flex;
+    margin-top: 10%;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+#delete-btn {
+    padding: 12px 32px;
+    background-color: white;
+    color: #dd3a3a;
+    border: 2px solid #dd3a3a;
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    margin-right: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+#delete-btn:hover {
+    background-color: #dd3a3a;
+    color: #ffffff;
+}
+
+#accepted-btn {
+    padding: 12px 22px;
+    background-color: #9b9b9b;
+    color: #fff;
+    font-weight: bold;
+    border: 2px solid #9b9b9b;
+    cursor: pointer;
+    border-radius: 8px;
+}

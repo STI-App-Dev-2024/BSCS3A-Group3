@@ -1051,6 +1051,7 @@ async function ShareQuiz(quizId, inFolder, inFolderId) {
                 message: shareQuizInputMessage,
                 senderFirstName: firstName,
                 senderLastName: lastName,
+                status: "pending",
               });
 
               // target location (paste)
