@@ -87,14 +87,26 @@ const shareQuizzesContainer = document.getElementById(
 );
 
 // Shared quiz id
-let sharedQuizId;
+let previousQuizId;
+let sharedQuizId = null;
 
 shareQuizzesContainer.addEventListener("click", HandleClick);
 async function HandleClick(event) {
   const elementId = event.target.id;
-  sharedQuizId = elementId;
-
   if (elementId !== "shared-quizzes-container") {
+    previousQuizId = sharedQuizId;
+    sharedQuizId = elementId;
+
+    if (previousQuizId == null) {
+      const quizElement = document.getElementById(sharedQuizId);
+      quizElement.style.background = "#95d69e";
+    } else {
+      const previousQuizElement = document.getElementById(previousQuizId);
+      previousQuizElement.style.background = "#FFFFFF";
+
+      const quizElement = document.getElementById(sharedQuizId);
+      quizElement.style.background = "#95d69e";
+    }
     // Gets the data and pass the details
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -119,11 +131,19 @@ async function HandleClick(event) {
           const Message = document.getElementById("message");
 
           if (status == "accepted") {
+            const buttonContainer = document.getElementById("declined-btn");
+            buttonContainer.style.display = "none";
             document.querySelector(".buttonContainer").style.display = "none";
             document.querySelector(".buttonContainer2").style.display = "flex";
+            const declinedBtn = document.getElementById("accepted-btn");
+            declinedBtn.style.display = "flex";
           } else if (status == "declined") {
-            const buttonContainer = document.getElementById("buttonContainer");
-            buttonContainer.style.display = "none";
+            document.querySelector(".buttonContainer").style.display = "none";
+            document.querySelector(".buttonContainer2").style.display = "flex";
+            const acceptedBtn = document.getElementById("accepted-btn");
+            acceptedBtn.style.display = "none";
+            const declinedBtn = document.getElementById("declined-btn");
+            declinedBtn.style.display = "flex";
           } else {
             document.querySelector(".buttonContainer").style.display = "flex";
             document.querySelector(".buttonContainer2").style.display = "none";
@@ -191,8 +211,19 @@ document.getElementById("decline-btn").onclick = function () {
           sharedQuizId
         );
 
-        const status = { status: "declined " };
-        await setDoc(sharedQuizRef, status, { merge: true });
+        const sharedQuizSnapshot = await getDoc(sharedQuizRef);
+        const quizData = sharedQuizSnapshot.data();
+        quizData.sharedDetails[0].status = "declined";
+
+        // updates the button
+        document.querySelector(".buttonContainer").style.display = "none";
+        document.querySelector(".buttonContainer2").style.display = "flex";
+        const acceptedBtn = document.getElementById("accepted-btn");
+        acceptedBtn.style.display = "none";
+        const declinedBtn = document.getElementById("declined-btn");
+        declinedBtn.style.display = "flex";
+
+        await setDoc(sharedQuizRef, quizData, { merge: true });
       } catch (error) {
         console.error(error);
       }

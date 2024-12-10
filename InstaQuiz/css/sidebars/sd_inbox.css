@@ -262,7 +262,7 @@ h1 {
 }
 
 #shared-quizzes-details-container2:hover {
-     box-shadow: 0 0 15px 2px #95d69e; /* Glowing green effect */
+     box-shadow: 0 0 15px 2px #95d69e;
 }
 
 #quizName {
@@ -360,6 +360,17 @@ h1 {
 }
 
 #accepted-btn {
+    padding: 12px 22px;
+    background-color: #9b9b9b;
+    color: #fff;
+    font-weight: bold;
+    border: 2px solid #9b9b9b;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+#declined-btn {
+    display: "none";
     padding: 12px 22px;
     background-color: #9b9b9b;
     color: #fff;
